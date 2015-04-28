@@ -3,24 +3,48 @@ package cluster
 import (
   "math"
   "github.com/realb0t/go-clope/atom"
-  "github.com/realb0t/go-clope/transaction"
+  trans "github.com/realb0t/go-clope/transaction"
 )
 
 type Cluster struct {
-  transactions []*transaction.Transaction
+  transactions []*trans.Transaction
   N int
   W int
   S float64
-  r float
+}
+
+func NewCluster() {
+  return &Cluster{[], 0, 0, 0.0}
 }
 
 func (c *Cluster) Occ(_ *atom.Atom) float64 {
   return 0.0
 }
 
+func (c *Cluster) AddTransaction(t *trans.Transaction) {
+  c.transactions = append(c.transactions, t)
+  t.Cluster.RemTransaction(t)
+  t.Cluster = c
+
+  c.N = len(c.transactions)
+  c.W = 0
+}
+
+func (c *Cluster) RemTransaction(t *trans.Transaction) {
+  ei := -1
+
+  for i, trans := range(c.transactions) {
+    if (t == trans) {  ei = i }
+  }
+
+  copy(c.transactions[ei:], c.transactions[ei+1:])
+  c.transactions[len(c.transactions)-1] = nil
+  c.transactions = c.transactions[:len(c.transactions)-1]
+}
+
 func (c *Cluster) DeltaAdd(t *Transaction) float64 {
   tItemsCount := count(t.Items)
-  S_new := c.S + tItemsCount
+  S_new := c.S + float64(tItemsCount)
   W_new := c.W
   toCounter := tItemsCount - 1
   for i := 0; i < toCounter; i++ {
