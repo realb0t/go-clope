@@ -6,45 +6,97 @@ import (
   trans "github.com/realb0t/go-clope/transaction"
 )
 
+// Структура кластера
 type Cluster struct {
-  transactions []*trans.Transaction
-  N int
-  W int
-  S float64
+  Id int // ID
+  transactions []*trans.Transaction // массив транзакций
+  // Кластерные характеристики
+  N int // количества транзакций
+  W int // числа уникальных объектов (или ширины кластера) 
+  S int // площади кластера
+  atoms map[*atom.Atom]int // хеш атомов (элементов) кластера 
 }
 
-func NewCluster() {
-  return &Cluster{[], 0, 0, 0.0}
+// Создать новый кластер
+func NewCluster(id int) {
+  return &Cluster{id, [], 0, 0, 0, []}
 }
 
-func (c *Cluster) Occ(_ *atom.Atom) float64 {
-  return 0.0
+// Количество (частота) атомов в кластере
+func (c *Cluster) Occ(atom *atom.Atom) int {
+  return с.atoms[atom]
 }
 
-func (c *Cluster) AddTransaction(t *trans.Transaction) {
-  c.transactions = append(c.transactions, t)
-  t.Cluster.RemTransaction(t)
-  t.Cluster = c
+// Обновление хеша атомов кластера при добавлении транзакции
+func (c *Cluster) RefreshAtomsAfterAdd(t *trans.Transaction) {
+  for _, atom := range(t.Items) {
+    if c.atoms[atom] == nil {
+      c.atoms[atom] := 1
+    } else {
+      c.atoms[atom] = c.atoms[atom] + 1
+    }
+  }
+}
 
+// Обновление хеша атомов кластера при удалении транзакции
+func (c *Cluster) RefreshAtomsAfterRemove(t *trans.Transaction) {
+  for _, atom := range(t.Items) {
+    if c.atoms[atom] != nil {
+      c.atoms[atom] = c.atoms[atom] - 1
+      if c.atoms[atom] == 0 {
+        delete(c.atoms, atom)
+      }
+    }
+  }
+}
+
+// Обновление кластерных характеристик
+func (c *Cluster) Refresh() {
   c.N = len(c.transactions)
-  c.W = 0
+  c.W = len(c.atoms)
+  c.S = 0
+
+  for _, a := range(c.atoms) {
+    c.S = c.S + c.Occ(a)
+  }
 }
 
-func (c *Cluster) RemTransaction(t *trans.Transaction) {
+// Добавление транзакции в кластер
+func (c *Cluster) MoveTransaction(t *trans.Transaction) {
+  // Добавляем транзакцию к текущему кластеру
+  c.transactions = append(c.transactions, t)
+  // Обновляем кластерные характеристики
+  c.RefreshAtomsAfterAdd(t)
+  c.Refresh()
+  // Удаляем транзакцию из старого кластера (если есть)
+  if t.Cluster != nil {
+    t.Cluster.RemoveTransaction(t)
+  }
+  // и переключаем указатель кластера в транзакции
+  // на новый.
+  t.Cluster = c
+}
+
+// Удаление транзакции из кластера
+func (c *Cluster) RemoveTransaction(t *trans.Transaction) {
   ei := -1
 
   for i, trans := range(c.transactions) {
-    if (t == trans) {  ei = i }
+    if (t == trans) { ei = i }
   }
 
   copy(c.transactions[ei:], c.transactions[ei+1:])
   c.transactions[len(c.transactions)-1] = nil
   c.transactions = c.transactions[:len(c.transactions)-1]
+
+  c.RefreshAtomsAfterRemove()
+  c.Refresh()
 }
 
-func (c *Cluster) DeltaAdd(t *Transaction) float64 {
-  tItemsCount := count(t.Items)
-  S_new := c.S + float64(tItemsCount)
+// Подсчет дельта-веса при добавлении транзакции в кластер
+func (c *Cluster) DeltaAdd(t *Transaction, r float64) float64 {
+  tItemsCount := len(t.Items)
+  S_new := float64(c.S + tItemsCount)
   W_new := c.W
   toCounter := tItemsCount - 1
   for i := 0; i < toCounter; i++ {

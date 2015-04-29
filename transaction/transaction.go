@@ -2,10 +2,12 @@ package transaction
 
 import (
   "github.com/realb0t/go-clope/atom"
+  cl "github.com/realb0t/go-clope/cluster"
 )
 
 type Transaction struct {
-  Items []*atom.Atom
+  Items []*atom.Atom // Атомы транзакции
+  Cluster *cl.Cluster // Текущий кластер транзакции
 }
 
 // Создание новой транзакции из массива атомов

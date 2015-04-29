@@ -10,5 +10,5 @@ type Reader interface {
 }
 
 type Writer interface {
-  Write(*transaction.Transaction, *cluster.Cluster)
+  Write(*transaction.Transaction)
 }
