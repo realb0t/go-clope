@@ -8,8 +8,7 @@ var Atoms map[string]*Atom
 
 // Сбросить все существующие атомы
 func Reset() {
-  Atoms = nil
-  Atoms = map[string]*Atom{} 
+  Atoms = make(map[string]*Atom, 0)
 }
 
 // Создание нового атома
@@ -17,7 +16,7 @@ func Reset() {
 // то операция возвращает nil
 func NewAtom(label string) *Atom {
   if Atoms == nil {
-    Atoms = make(map[string]*Atom, 0)
+    Reset()
   }
 
   if Atoms[label] != nil {

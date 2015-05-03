@@ -12,7 +12,6 @@ type Process struct {
   reader *io.Reader
   writer *io.Writer
   r float64
-  clusters map[*clu.Cluster]bool
 }
 
 // Создание нового процесса
@@ -20,36 +19,20 @@ func NewProcess(reader *io.Reader, writer *io.Writer, r float64) {
   return &Process{reader, writer, r, make([]*clu.Cluster, 0)}
 }
 
-// Возвращает массив кластеров
-func (p *Process) Clusters() []*clu.Cluster {
-  clusters := make([]*clu.Cluster, 0)
-  for cluster, _ := range(p.clusters) {
-    clusters = append(clusters, cluster)
-  }
-  return clusters;
-}
-
-// Создает новый кластер и добавляет в него транзакцию
-func (p *Process) CreateCluster(t *tsn.Transaction) *clu.Cluster {
-    newClasterId := len(p.clusters) + 1
-    newCluster := cluster.NewCluster()
-    return newCluster
-}
-
 // Выбирает Лучший кластер или Cоздает Новый кластер,
 // добавляет в него транзакцию и возвращает этот кластер
 func (p *Process) BestClusterFor(t *tsn.Transaction) *clu.Cluster {
   var bestCluster *clu.Cluster
 
-  if len(p.clusters) > 0 {
-    tempW := float64(count(t.Items))
+  if len(clu.Clusters) > 0 {
+    tempW := float64(count(t.Atoms))
     tempS := tempW
     deltaMax := tempS / Math.pow(tempW, p.r)
 
     // Эту часть алгоритма возможно распараллелить
     // если потребуется работа с большим количеством
     // кластеров
-    for cluster, _ := range(p.clusters) {
+    for id, cluster := range(clu.Clusters) {
       curDelta = cluster.DeltaAdd(t, p.r)
       if (curDelta > deltaMax) {
         deltaMax = curDelta
@@ -59,7 +42,7 @@ func (p *Process) BestClusterFor(t *tsn.Transaction) *clu.Cluster {
   }
 
   if bestCluster == nil {
-    bestCluster = p.CreateCluster(t)
+    bestCluster = cluster.AddCluster()
   }
   return bestCluster
 }
@@ -69,7 +52,6 @@ func (p *Process) Initialization() {
   for trans := p.reader.Next() {
     bestCluster := p.BestClusterFor(trans)
     bestCluster.MoveTransaction(trans)
-    p.clusters[bestCluster] = true
     p.writer.Write(trans, bestCluster)
   }
 }
@@ -81,15 +63,12 @@ func (p *Process) Iteration() {
   moved := false
   for moved == false {
     for trans := p.reader.Next() {
+      // @todo Избавиться от .Cluster
       lastCluster := trans.Cluster
       bestCluster := p.BestClusterFor(trans)
       // Исли "лучший" кластер не текущий кластер
       if bestCluster.Id != lastCluster.Id {
         bestCluster.MoveTransaction(trans)
-        p.clusters[bestCluster] = true
-        if lastCluster.N == 0 {
-          delete(p.clusters, lastCluster)
-        }
         p.writer.Write(trans)
         moved = true
       }
@@ -99,6 +78,7 @@ func (p *Process) Iteration() {
 
 // Построение размещения с одной итерацией
 func (p *Process) Build() {
+  clu.Reset()
   p.Initialization()
   p.Iteration()
 }

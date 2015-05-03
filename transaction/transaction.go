@@ -2,17 +2,17 @@ package transaction
 
 import (
   "github.com/realb0t/go-clope/atom"
-  cl "github.com/realb0t/go-clope/cluster"
 )
 
+// Структура транзакции
 type Transaction struct {
-  Items []*atom.Atom // Атомы транзакции
-  Cluster *cl.Cluster // Текущий кластер транзакции
+  Atoms []*atom.Atom // Атомы транзакции
+  ClusterId int
 }
 
 // Создание новой транзакции из массива атомов
 func NewTransaction(atoms []*atom.Atom) *Transaction {
-  return &Transaction{atoms}
+  return &Transaction{atoms, -1}
 }
 
 // Создание новой транзации из массива строк или атомов
