@@ -10,6 +10,13 @@ func TestNewTransaction(t *testing.T) {
 }
 
 func TestBuildTransaction(t *testing.T) {
-  labels := []string{ "a", "b", "c" }
-  _ = BuildTransaction(labels)
+  trans1 := BuildTransaction([]string{ "a", "b", "c" })
+  if len(trans1.Atoms) != 3 {
+    t.Error("Not correct atoms for first transaction")
+  }
+
+  trans2 := BuildTransaction([]string{ "a", "b", "c", "d" })
+  if len(trans2.Atoms) != 4 {
+    t.Error("Not correct atoms for second transaction")
+  }
 }

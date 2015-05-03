@@ -13,27 +13,25 @@ func Reset() {
 
 // Создание нового атома
 // если такой атом уже существует
-// то операция возвращает nil
+// то не создает новый атом а возвращает старый
 func NewAtom(label string) *Atom {
-  if Atoms == nil {
-    Reset()
-  }
-
-  if Atoms[label] != nil {
-    return nil
-  } else {
+  if Atoms == nil { Reset() }
+  if _, ok := Atoms[label]; !ok {
     Atoms[label] = &Atom{label}
-    return Atoms[label]
   }
+  return Atoms[label]
 }
 
+// Возвращает массив атомов в
+// сооответствии с массивом строк
 func NewAtoms(labels []string) []*Atom {
   atoms := make([]*Atom, 0)
   for _, label := range(labels) {
-    newAtom := NewAtom(label)
-    if newAtom != nil {
-      atoms = append(atoms, newAtom)
-    }
+    atoms = append(atoms, NewAtom(label))
   }
   return atoms
+}
+
+func (a *Atom) String() string {
+  return a.Label
 }

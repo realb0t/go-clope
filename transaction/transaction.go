@@ -28,3 +28,7 @@ func BuildTransaction(atoms interface{}) *Transaction {
   }
   return trans
 }
+
+func (t *Transaction) String() []*atom.Atom {
+  return t.Atoms
+}

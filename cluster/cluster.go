@@ -14,8 +14,8 @@ type Cluster struct {
   // одинаковых транзакций
   transactions []*trn.Transaction // массив транзакций
   // Кластерные характеристики
-  N int // количества транзакций
-  W int // числа уникальных объектов (или ширины кластера) 
+  N int // кол-во транзакций
+  W int // кол-во уникальных объектов/атомов (или ширины кластера) 
   S int // площади кластера
   // Хеш атомов (элементов) кластера 
   // Ключ - это Атом
@@ -83,23 +83,6 @@ func (c *Cluster) refresh() {
   }
 }
 
-// Добавление/Перемещение транзакции в кластер
-func (c *Cluster) MoveTransaction(t *trn.Transaction) {
-  // Добавляем транзакцию к текущему кластеру
-  c.transactions = append(c.transactions, t)
-  // Обновляем кластерные характеристики
-  c.refreshAtomsAfterAdd(t)
-  c.refresh()
-  // Если для транзакции был определен кластер
-  if t.ClusterId != -1 {
-    // Удаляем транзакцию из старого кластера
-    Clusters[t.ClusterId].removeTransaction(t)
-  }
-  // и переключаем указатель кластера в транзакции
-  // на текущий кластер
-  t.ClusterId = c.Id
-}
-
 // Удаление транзакции из кластера
 func (c *Cluster) removeTransaction(t *trn.Transaction) {
   ei := -1
@@ -119,6 +102,23 @@ func (c *Cluster) removeTransaction(t *trn.Transaction) {
     c.refreshAtomsAfterRemove(t)
     c.refresh()
   }
+}
+
+// Добавление/Перемещение транзакции в кластер
+func (c *Cluster) MoveTransaction(t *trn.Transaction) {
+  // Добавляем транзакцию к текущему кластеру
+  c.transactions = append(c.transactions, t)
+  // Обновляем кластерные характеристики
+  c.refreshAtomsAfterAdd(t)
+  c.refresh()
+  // Если для транзакции был определен кластер
+  if t.ClusterId != -1 {
+    // Удаляем транзакцию из старого кластера
+    Clusters[t.ClusterId].removeTransaction(t)
+  }
+  // и переключаем указатель кластера в транзакции
+  // на текущий кластер
+  t.ClusterId = c.Id
 }
 
 // Подсчет дельта-веса при добавлении транзакции в кластер
