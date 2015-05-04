@@ -1,7 +1,6 @@
-package clope
+package io
 
 import (
-  "github.com/realb0t/go-clope/cluster"
   "github.com/realb0t/go-clope/transaction"
 )
 
