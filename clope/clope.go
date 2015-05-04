@@ -9,14 +9,14 @@ import (
 
 // Структура процесса
 type Process struct {
-  reader io.Reader
-  writer io.Writer
+  input io.Input
+  output io.Output
   r float64
 }
 
 // Создание нового процесса
-func NewProcess(reader io.Reader, writer io.Writer, r float64) *Process {
-  return &Process{reader, writer, r}
+func NewProcess(input io.Input, output io.Output, r float64) *Process {
+  return &Process{input, output, r}
 }
 
 // Выбирает Лучший кластер или Cоздает Новый кластер,
@@ -49,11 +49,10 @@ func (p *Process) BestClusterFor(t *tsn.Transaction) *clu.Cluster {
 
 // Инициализация первоначального размещения
 func (p *Process) Initialization() {
-  for trans := p.reader.Next(); trans != nil; {
+  for trans := p.input.Next(); trans != nil; {
     bestCluster := p.BestClusterFor(trans)
     bestCluster.MoveTransaction(trans)
-    p.writer.Write(trans)
-    trans = p.reader.Next()
+    p.output.Write(trans)
   }
 }
 
@@ -63,14 +62,14 @@ func (p *Process) Initialization() {
 func (p *Process) Iteration() {
   moved := false
   for moved == false {
-    for trans := p.reader.Next(); trans != nil; {
+    for trans := p.output.Next(); trans != nil; {
       lastClusterId := trans.ClusterId
       // Ищем наилучший клстер для данной транзакции
       bestCluster := p.BestClusterFor(trans)
       // Eсли "лучший" кластер не текущий кластер
       if bestCluster.Id != lastClusterId {
         bestCluster.MoveTransaction(trans)
-        p.writer.Write(trans)
+        p.output.Write(trans)
         moved = true
       }
     }
