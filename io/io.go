@@ -21,8 +21,8 @@ type MemoryInput struct {
 }
 
 // Создать новый тестовый Ввод
-func NewMemoryInput(data []*transaction.Transaction) *MemoryInput {
-  return &MemoryInput{data}
+func NewMemoryInput(data *[]*transaction.Transaction) *MemoryInput {
+  return &MemoryInput{*data}
 }
 
 // Тестовый Вывод (test output)
