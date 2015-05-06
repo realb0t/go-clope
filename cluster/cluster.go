@@ -26,6 +26,7 @@ type Cluster struct {
 
 // Созданные кластеры
 var Clusters map[int]*Cluster
+var nextId = 1
 
 func Print() {
   for _, cluster := range(Clusters) {
@@ -36,6 +37,7 @@ func Print() {
 // Сбросить набор кластеров
 func Reset() {
   Clusters = make(map[int]*Cluster, 0)
+  nextId = 1
 }
 
 // Создать новый кластер
@@ -46,9 +48,10 @@ func NewCluster(id int) *Cluster {
 // Создать и Добавить новый кластер
 func AddCluster() *Cluster {
   if Clusters == nil { Reset() }
-  nextId := len(Clusters)
-  Clusters[nextId] = NewCluster(nextId)
-  return Clusters[nextId]
+  curId := nextId
+  nextId++
+  Clusters[curId] = NewCluster(curId)
+  return Clusters[curId]
 }
 
 func (c *Cluster) String() string {
