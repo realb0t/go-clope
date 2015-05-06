@@ -48,11 +48,11 @@ func TestDeltaAddEvaluative(t *testing.T) {
   r := 2.6
 
   trans := []*trn.Transaction{
-    trn.BuildTransaction([]string{ "a", "b" }),
-    trn.BuildTransaction([]string{ "a", "b", "c" }),
-    trn.BuildTransaction([]string{ "a", "c", "d" }),
-    trn.BuildTransaction([]string{ "d", "e" }),
-    trn.BuildTransaction([]string{ "d", "e", "f" }),
+    trn.Make( "a", "b" ),
+    trn.Make( "a", "b", "c" ),
+    trn.Make( "a", "c", "d" ),
+    trn.Make( "d", "e" ),
+    trn.Make( "d", "e", "f" ),
   }
 
   clusters := []*Cluster{ AddCluster(),

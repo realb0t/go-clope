@@ -18,14 +18,14 @@ func TestNewProcess(t *testing.T) {
 
 func TestBuildIntegration(t *testing.T) {
   trans := []*tr.Transaction{ 
-    tr.NewTransaction(a.NewAtoms([]string{ "a", "b" })),
-    tr.NewTransaction(a.NewAtoms([]string{ "a", "b", "c" })),
-    tr.NewTransaction(a.NewAtoms([]string{ "a", "c", "d" })),
-    tr.NewTransaction(a.NewAtoms([]string{ "d", "e" })),
-    tr.NewTransaction(a.NewAtoms([]string{ "d", "e", "f" })),
-    tr.NewTransaction(a.NewAtoms([]string{ "h", "e", "l", "l", "o", " ", "w", "o", "r", "l", "d" })),
-    tr.NewTransaction(a.NewAtoms([]string{ "h", "e", "l", "l", "o" })),
-    tr.NewTransaction(a.NewAtoms([]string{ "w", "o", "r", "l", "d" })),
+    tr.Make( "a", "b" ),
+    tr.Make( "a", "b", "c" ),
+    tr.Make( "a", "c", "d" ),
+    tr.Make( "d", "e" ),
+    tr.Make( "d", "e", "f" ),
+    tr.Make( "h", "e", "l", "l", "o", " ", "w", "o", "r", "l", "d" ),
+    tr.Make( "h", "e", "l", "l", "o" ),
+    tr.Make( "w", "o", "r", "l", "d" ),
   }
 
   input   := io.NewMemoryInput(&trans)

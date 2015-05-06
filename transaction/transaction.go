@@ -11,6 +11,10 @@ type Transaction struct {
   ClusterId int
 }
 
+func Make(stringAtoms ...string) *Transaction {
+  return NewTransaction(atom.NewAtoms(stringAtoms))
+}
+
 // Создание новой транзакции из массива атомов
 func NewTransaction(atoms []*atom.Atom) *Transaction {
   return &Transaction{atoms, -1}
