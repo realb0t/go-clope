@@ -1,6 +1,7 @@
 package cluster
 
 import (
+  "fmt"
   "math"
   "github.com/realb0t/go-clope/atom"
   trn "github.com/realb0t/go-clope/transaction"
@@ -26,6 +27,12 @@ type Cluster struct {
 // Созданные кластеры
 var Clusters map[int]*Cluster
 
+func Print() {
+  for _, cluster := range(Clusters) {
+    fmt.Println(cluster)
+  }
+}
+
 // Сбросить набор кластеров
 func Reset() {
   Clusters = make(map[int]*Cluster, 0)
@@ -42,6 +49,11 @@ func AddCluster() *Cluster {
   nextId := len(Clusters)
   Clusters[nextId] = NewCluster(nextId)
   return Clusters[nextId]
+}
+
+func (c *Cluster) String() string {
+  s := fmt.Sprintf("[%d] - %v", c.Id, c.transactions)
+  return s
 }
 
 // Количество (частота) атомов в кластере

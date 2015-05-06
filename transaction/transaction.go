@@ -1,6 +1,7 @@
 package transaction
 
 import (
+  "fmt"
   "github.com/realb0t/go-clope/atom"
 )
 
@@ -29,6 +30,6 @@ func BuildTransaction(atoms interface{}) *Transaction {
   return trans
 }
 
-func (t *Transaction) String() []*atom.Atom {
-  return t.Atoms
+func (t *Transaction) String() string {
+  return fmt.Sprintf("%v", t.Atoms)
 }

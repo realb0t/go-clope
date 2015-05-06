@@ -20,9 +20,20 @@ func TestMemoryInputNext(t *testing.T) {
     tr.NewTransaction(a.NewAtoms([]string{ "c" })),
   }
   input := NewMemoryInput(&trans)
-  nextTran := input.Next()
-  if nextTran != trans[1] {
-    t.Error("Next transaction", nextTran, " != ", trans[1] )
+  firstTrans := input.Next()
+  secondTrans := input.Next()
+  thirdTrans := input.Next()
+
+  if firstTrans != trans[1] {
+    t.Error("Next transaction", firstTrans, " != ", trans[1] )
+  }
+
+  if secondTrans != trans[0] {
+    t.Error("Next transaction", secondTrans, " != ", trans[0] )
+  }
+
+  if thirdTrans != nil {
+    t.Error("Next transaction", secondTrans, " != nil")
   }
 }
 

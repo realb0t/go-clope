@@ -37,6 +37,8 @@ func NewMemoryOutput() *MemoryOutput {
 
 // Извлечь следующее значение из Ввода
 func (r *MemoryInput) Next() *transaction.Transaction {
+  lenData := len(r.data)
+  if lenData == 0 { return nil }
   var trans *transaction.Transaction
   trans, r.data = r.data[len(r.data)-1], r.data[:len(r.data)-1]
   return trans
@@ -44,13 +46,11 @@ func (r *MemoryInput) Next() *transaction.Transaction {
 
 // Извлечь следующее значение из Вывода
 func (r *MemoryOutput) Next() *transaction.Transaction {
-  if len(r.Data) > 0 {
-    var trans *transaction.Transaction
-    trans, r.Data = r.Data[len(r.Data)-1], r.Data[:len(r.Data)-1]
-    return trans
-  } else {
-    return nil
-  }
+  lenData := len(r.Data)
+  if lenData == 0 { return nil }
+  var trans *transaction.Transaction
+  trans, r.Data = r.Data[lenData-1], r.Data[:lenData-1]
+  return trans
 }
 
 // Записать значение в ввод и сбросить счетчик извлечения значений
