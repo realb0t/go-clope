@@ -30,7 +30,7 @@ func TestBuildIntegration(t *testing.T) {
 
   input   := io.NewMemoryInput(&trans)
   output  := io.NewMemoryOutput()
-  process := NewProcess(input, output, 2.6)
+  process := NewProcess(input, output, 2.0)
   process.Build()
   //cluster.Print()
 }
