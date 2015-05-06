@@ -72,6 +72,7 @@ func (p *Process) Iteration() {
       }
     }
   }
+  clu.RemoveEmpty()
 }
 
 // Построение размещения с одной итерацией

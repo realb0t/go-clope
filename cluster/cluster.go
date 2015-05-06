@@ -54,6 +54,20 @@ func AddCluster() *Cluster {
   return Clusters[curId]
 }
 
+// Удаление пустых кластеров
+func RemoveEmpty() {
+  for id, cluster := range(Clusters) {
+    if cluster.isEmpty() {
+      delete(Clusters, id)
+    }
+  }
+}
+
+func (c *Cluster) isEmpty() bool {
+  return len(c.transactions) == 0
+}
+
+// Преобразование к строке
 func (c *Cluster) String() string {
   s := fmt.Sprintf("[%d] - %v", c.Id, c.transactions)
   return s

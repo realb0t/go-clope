@@ -20,11 +20,29 @@ func TestAddCluster(t *testing.T) {
   }
 }
 
+func TestRemoveEmpty(t *testing.T) {
+  Reset()
+  trans := trn.Make( "a", "d" )
+  _ = AddCluster()
+  secondCluster := AddCluster()
+  secondCluster.MoveTransaction(trans)
+
+  if len(Clusters) != 2 {
+    t.Error("Clusters count uncorrect before remove", len(Clusters))
+  }
+
+  RemoveEmpty()
+
+  if len(Clusters) != 1 {
+    t.Error("Clusters count uncorrect after remove")
+  }
+}
+
 func TestMoveTransaction(t *testing.T) {
   Reset()
   cluster := AddCluster()
-  trans1 := trn.BuildTransaction([]string{ "a", "b", "c" })
-  trans2 := trn.BuildTransaction([]string{ "a", "d" })
+  trans1 := trn.Make( "a", "b", "c" )
+  trans2 := trn.Make( "a", "d" )
   cluster.MoveTransaction(trans1)
   cluster.MoveTransaction(trans2)
   
