@@ -88,7 +88,7 @@ Package `go-clope/io` have test IO-structures `MemoryInput` and `MemoryOutput` f
 You can create other IO structures for other data stores (PostgreSQL, MongoDB, Redis, e.t.c.).
 
 Your IO structures must implement for interface:
-```
+```go
 type Input interface {
   // Pop next transaction unlinked from data store.
   Next() *transaction.Transaction
