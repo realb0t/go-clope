@@ -1,5 +1,5 @@
 # go-clope
-Go lang implementation of CLOPE clusterization algorythm with parallel calculation and IO interfaces.
+Go lang implementation of [CLOPE]() clusterization algorythm with parallel calculation and IO interfaces.
 
 ## Install and Run example
 
@@ -58,8 +58,10 @@ Output Next/Write can include into DB-transaction.
 ## Data Structures
 
 **Transaction** - is data-transaction structure have uniq atoms.
+
 **Atom** - is data structure for build transaction entity (as string). 
 Example: `gender:female`, `income:site-from.com`, etc.
+
 **Clusters** - map of all linked transaction.
 
 ## Usage
