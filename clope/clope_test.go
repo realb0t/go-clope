@@ -5,7 +5,7 @@ import (
   "github.com/realb0t/go-clope/io"
   a "github.com/realb0t/go-clope/atom"
   tr "github.com/realb0t/go-clope/transaction"
-  _ "github.com/realb0t/go-clope/cluster"
+  cl "github.com/realb0t/go-clope/cluster"
 )
 
 func TestNewProcess(t *testing.T) {
@@ -30,7 +30,21 @@ func TestBuildIntegration(t *testing.T) {
 
   input   := io.NewMemoryInput(&trans)
   output  := io.NewMemoryOutput()
-  process := NewProcess(input, output, 2.0)
+  process := NewProcess(input, output, 1.8)
   process.Build()
-  //cluster.Print()
+  
+  clusterCheck := (
+    cl.Clusters[1].Tran(0) == trans[7] &&
+    cl.Clusters[1].Tran(1) == trans[6] &&
+    cl.Clusters[1].Tran(2) == trans[5] &&
+    cl.Clusters[2].Tran(0) == trans[2] &&
+    cl.Clusters[2].Tran(1) == trans[1] &&
+    cl.Clusters[2].Tran(2) == trans[0] &&
+    cl.Clusters[2].Tran(3) == trans[3] &&
+    cl.Clusters[2].Tran(4) == trans[4])
+
+  if !clusterCheck {
+    cl.Print()
+    t.Error("Not valid clusters")
+  }
 }

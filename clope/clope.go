@@ -34,6 +34,7 @@ func (p *Process) BestClusterFor(t *tsn.Transaction) *clu.Cluster {
       // если потребуется работа с большим количеством
       // кластеров
       curDelta := cluster.DeltaAdd(t, p.r)
+
       if (curDelta > deltaMax) {
         deltaMax = curDelta
         bestCluster = cluster
@@ -60,8 +61,10 @@ func (p *Process) Initialization() {
 // расположения транзакций по кластерам
 // За одну итерацию перемещается одна транзакция
 func (p *Process) Iteration() {
-  moved := false
-  for moved == false {
+  
+  for {
+    moved := false
+
     for trans := p.output.Next(); trans != nil; trans = p.output.Next() {
       lastClusterId := trans.ClusterId
       bestCluster := p.BestClusterFor(trans)
@@ -71,6 +74,8 @@ func (p *Process) Iteration() {
         moved = true
       }
     }
+
+    if !moved { break }
   }
   clu.RemoveEmpty()
 }

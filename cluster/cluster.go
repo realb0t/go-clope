@@ -63,8 +63,14 @@ func RemoveEmpty() {
   }
 }
 
+// Пустой ли кластер
 func (c *Cluster) isEmpty() bool {
   return len(c.transactions) == 0
+}
+
+// Возвращает транзакцию по индексу
+func (c *Cluster) Tran(i int) *trn.Transaction {
+  return c.transactions[i]
 }
 
 // Преобразование к строке
