@@ -83,11 +83,13 @@ Base usage:
 
 After `Build` you can call again `Iteration`.
 
+For read results you can make use of your IO Output or `cluster.Clusters` map or `cluster.Print()` function for print.
+
 ## IO interface
 
 Package `go-clope/io` have test IO-structures `MemoryInput` and `MemoryOutput` for memoty data storing . 
 
-You can create other IO structures for other data stores (PostgreSQL, MongoDB, Redis, e.t.c.).
+You can create other IO structures for other data stores (PostgreSQL, MongoDB, Redis, etc.).
 
 Your IO structures must implement for interface:
 ```go
