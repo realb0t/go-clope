@@ -1,5 +1,5 @@
 # go-clope
-Go lang implementation of [CLOPE]() clusterization algorythm with parallel calculation and IO interfaces.
+Go lang implementation of [CLOPE](https://www.google.ru/search?q=clope) clusterization algorythm with parallel calculation and IO interfaces.
 
 ## Install and Run example
 
@@ -87,7 +87,7 @@ For read results you can make use of your IO Output or `cluster.Clusters` map or
 
 ## IO interface
 
-Package `go-clope/io` have test IO-structures `MemoryInput` and `MemoryOutput` for memoty data storing . 
+Package `go-clope/io` have test IO-structures `MemoryInput` and `MemoryOutput` for memory data storing . 
 
 You can create other IO structures for other data stores (PostgreSQL, MongoDB, Redis, etc.).
 
