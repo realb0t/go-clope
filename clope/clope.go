@@ -1,6 +1,7 @@
 package clope
 
 import (
+  "sync"
   "math"
   "github.com/realb0t/go-clope/io"
   clu "github.com/realb0t/go-clope/cluster"
@@ -19,25 +20,42 @@ func NewProcess(input io.Input, output io.Output, r float64) *Process {
   return &Process{input, output, r}
 }
 
+type SyncMsg struct {
+  Delta float64
+  Cluster *clu.Cluster
+}
+
 // Выбирает Лучший кластер или Cоздает Новый кластер,
 // добавляет в него транзакцию и возвращает этот кластер
 func (p *Process) BestClusterFor(t *tsn.Transaction) *clu.Cluster {
   var bestCluster *clu.Cluster
 
   if len(clu.Clusters) > 0 {
+    var wg sync.WaitGroup
     tempW := float64(len(t.Atoms))
     tempS := tempW
     deltaMax := tempS / math.Pow(tempW, p.r)
+    syncDelta := make(chan *SyncMsg)
+
+    wg.Add(len(clu.Clusters))
 
     for _, cluster := range(clu.Clusters) {
-      // Эту часть программы возможно распараллелить
-      // если потребуется работа с большим количеством
-      // кластеров
-      curDelta := cluster.DeltaAdd(t, p.r)
+      go func(cluster *clu.Cluster) {
+        defer wg.Done()
+        curDelta := cluster.DeltaAdd(t, p.r)
+        syncDelta <- &SyncMsg{Delta: curDelta, Cluster: cluster}
+      }(cluster)
+    }
 
-      if (curDelta > deltaMax) {
-        deltaMax = curDelta
-        bestCluster = cluster
+    go func() {
+      wg.Wait()
+      close(syncDelta)
+    }()
+
+    for msg := range syncDelta {
+      if (msg.Delta > deltaMax) {
+        deltaMax = msg.Delta
+        bestCluster = msg.Cluster
       }
     }
   }
