@@ -57,7 +57,7 @@ Output Next/Write can include into DB-transaction.
 
 ## Data Structures
 
-**Transaction** - is data-transaction structure have uniq atoms.
+**Transaction** - is data-transaction structure have atoms collection.
 
 **Atom** - is data structure for build transaction entity (as string). 
 Example: `gender:female`, `income:site-from.com`, etc.
@@ -109,5 +109,6 @@ type Output interface {
 ## TODO
 
 - Abstract Transaction (with custom fields)
-- Clusters as Singleton
-- Uniq atoms in transaction (as correct test)
+- IO interface for Clusters
+- Apply decimal calculations
+- Create clustarization testing tools

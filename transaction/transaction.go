@@ -11,14 +11,18 @@ type Transaction struct {
   ClusterId int
 }
 
+// Создает транзакцию по набору String парамеров
 func Make(stringAtoms ...string) *Transaction {
   return NewTransaction(atom.NewAtoms(stringAtoms))
 }
 
+// Создает транзакцию с уникальным набором атомов
+// по набору String парамеров
 func MakeUniq(stringAtoms ...string) *Transaction {
   return NewUniqTransaction(atom.NewAtoms(stringAtoms))
 }
 
+// Создает новую непривязанную транзакцию
 func NewTransaction(atoms []*atom.Atom) *Transaction {
   return &Transaction{atoms, -1}
 }
@@ -30,7 +34,7 @@ func NewUniqTransaction(atoms []*atom.Atom) *Transaction {
   atomsMap := make(map[*atom.Atom]bool, 0)
   for _, atom := range(atoms) { atomsMap[atom] = true }
   for atom, _ := range(atomsMap) { uniqAtoms = append(uniqAtoms, atom) }
-  return &Transaction{uniqAtoms, -1}
+  return NewTransaction(uniqAtoms)
 }
 
 // Создание новой транзации из массива строк или атомов

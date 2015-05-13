@@ -72,3 +72,22 @@ func TestWithOtherOrders(t *testing.T) {
     t.Error("Not valid clusters")
   }
 }
+
+func TestWithUniqTransactions(t *testing.T) {
+  t.SkipNow()
+  // @todo Unskip after create testing tools
+
+  trans := []*tr.Transaction{ 
+    tr.MakeUniq( "a", "b", "a", "b", "c", "c" ),
+    tr.MakeUniq( "c", "b", "b", "c", "a" ),
+    tr.MakeUniq( "c", "d", "d", "c", "c", "d" ),
+    tr.MakeUniq( "d", "c", "b", "d", "b" ),
+  }
+
+  input   := io.NewMemoryInput(&trans)
+  output  := io.NewMemoryOutput()
+  process := NewProcess(input, output, 3.325)
+  process.Build()
+
+  cl.Print()
+}
