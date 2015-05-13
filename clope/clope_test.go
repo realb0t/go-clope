@@ -47,3 +47,28 @@ func TestBuildIntegration(t *testing.T) {
     t.Error("Not valid clusters")
   }
 }
+
+func TestWithOtherOrders(t *testing.T) {
+  trans := []*tr.Transaction{ 
+    tr.Make( "a", "b" ),
+    tr.Make( "b", "a" ),
+    tr.Make( "c", "d" ),
+    tr.Make( "d", "c", "b" ),
+  }
+
+  input   := io.NewMemoryInput(&trans)
+  output  := io.NewMemoryOutput()
+  process := NewProcess(input, output, 3.0)
+  process.Build()
+
+  clusterCheck := (
+    cl.Clusters[1].Tran(0) == trans[3] &&
+    cl.Clusters[1].Tran(1) == trans[2] &&
+    cl.Clusters[2].Tran(0) == trans[0] &&
+    cl.Clusters[2].Tran(1) == trans[1])
+
+  if !clusterCheck {
+    cl.Print()
+    t.Error("Not valid clusters")
+  }
+}
