@@ -104,4 +104,9 @@ type Output interface {
   // Write linked (to cluster) transaction into data store.
   Write(*transaction.Transaction)
 }
-``` 
+```
+
+## TODO
+
+- Abstract Transaction (with custom fields)
+- Clusters as Singleton
