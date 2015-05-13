@@ -15,9 +15,22 @@ func Make(stringAtoms ...string) *Transaction {
   return NewTransaction(atom.NewAtoms(stringAtoms))
 }
 
-// Создание новой транзакции из массива атомов
+func MakeUniq(stringAtoms ...string) *Transaction {
+  return NewUniqTransaction(atom.NewAtoms(stringAtoms))
+}
+
 func NewTransaction(atoms []*atom.Atom) *Transaction {
   return &Transaction{atoms, -1}
+}
+
+// Создание новой транзакции из массива атомов
+// новая транзакция не имеет состоит из уникальных атомов
+func NewUniqTransaction(atoms []*atom.Atom) *Transaction {
+  uniqAtoms := make([]*atom.Atom, 0)
+  atomsMap := make(map[*atom.Atom]bool, 0)
+  for _, atom := range(atoms) { atomsMap[atom] = true }
+  for atom, _ := range(atomsMap) { uniqAtoms = append(uniqAtoms, atom) }
+  return &Transaction{uniqAtoms, -1}
 }
 
 // Создание новой транзации из массива строк или атомов

@@ -32,7 +32,6 @@ func TestBuildIntegration(t *testing.T) {
   output  := io.NewMemoryOutput()
   process := NewProcess(input, output, 1.8)
   process.Build()
-  
   clusterCheck := (
     cl.Clusters[1].Tran(0) == trans[7] &&
     cl.Clusters[1].Tran(1) == trans[6] &&

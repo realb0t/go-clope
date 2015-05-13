@@ -110,3 +110,4 @@ type Output interface {
 
 - Abstract Transaction (with custom fields)
 - Clusters as Singleton
+- Uniq atoms in transaction
