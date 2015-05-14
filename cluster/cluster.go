@@ -57,14 +57,14 @@ func AddCluster() *Cluster {
 // Удаление пустых кластеров
 func RemoveEmpty() {
   for id, cluster := range(Clusters) {
-    if cluster.isEmpty() {
+    if cluster.IsEmpty() {
       delete(Clusters, id)
     }
   }
 }
 
 // Пустой ли кластер
-func (c *Cluster) isEmpty() bool {
+func (c *Cluster) IsEmpty() bool {
   return len(c.transactions) == 0
 }
 

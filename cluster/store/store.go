@@ -9,12 +9,11 @@ import (
 type ClusterStore interface {
   // Create new cluster in store and commit in store
   CreateCluster() *cluster.Cluster
-  // Remove all empty clusters from store
-  RemoveEmpty()
   // Add or move transaction into cluster by clusterId
   // and commit changes in store
   MoveTransaction(clusterId int, trans *transaction.Transaction) *cluster.Cluster
-  Reset()
+  // Remove all empty clusters from store
+  RemoveEmpty()
 }
 
 type MemoryStore struct {
@@ -42,13 +41,16 @@ func (s *MemoryStore) MoveTransaction(cId int, t *transaction.Transaction) {
   s.Clusters[cId].AddTransaction(t)
 }
 
+func (s *MemoryStore) RemoveEmpty() {
+  for id, cluster := range(s.Clusters) {
+    if cluster.IsEmpty() {
+      delete(s.Clusters, id)
+    }
+  }
+}
+
 func (s *MemoryStore) Print() {
   for _, cluster := range(s.Clusters) {
     fmt.Println(cluster)
   }
-}
-
-func (s *MemoryStore) Reset() {
-  s.Clusters = make(map[int]*cluster.Cluster, 0)
-  s.nextId = 1
 }
