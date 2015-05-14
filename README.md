@@ -108,6 +108,7 @@ type Output interface {
 
 ## TODO
 
+- Add MemoryOutput print interface
 - Abstract Transaction (with custom fields)
 - IO interface for Clusters
 - Apply decimal calculations
