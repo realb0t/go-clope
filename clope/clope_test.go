@@ -5,7 +5,7 @@ import (
   "github.com/realb0t/go-clope/io"
   a "github.com/realb0t/go-clope/atom"
   tr "github.com/realb0t/go-clope/transaction"
-  cl "github.com/realb0t/go-clope/cluster"
+  "github.com/realb0t/go-clope/cluster/store"
 )
 
 func TestNewProcess(t *testing.T) {
@@ -13,7 +13,7 @@ func TestNewProcess(t *testing.T) {
     tr.NewTransaction(a.NewAtoms([]string{ "a" })),
   }
   _ = NewProcess(io.NewMemoryInput(&trans),
-    io.NewMemoryOutput(), 1.0)
+    io.NewMemoryOutput(), store.NewMemoryStore(), 1.0)
 }
 
 func TestBuildIntegration(t *testing.T) {
@@ -30,20 +30,21 @@ func TestBuildIntegration(t *testing.T) {
 
   input   := io.NewMemoryInput(&trans)
   output  := io.NewMemoryOutput()
-  process := NewProcess(input, output, 1.8)
+  storage := store.NewMemoryStore()
+  process := NewProcess(input, output, storage, 1.8)
   process.Build()
   clusterCheck := (
-    cl.Clusters[1].Tran(0) == trans[7] &&
-    cl.Clusters[1].Tran(1) == trans[6] &&
-    cl.Clusters[1].Tran(2) == trans[5] &&
-    cl.Clusters[2].Tran(0) == trans[2] &&
-    cl.Clusters[2].Tran(1) == trans[1] &&
-    cl.Clusters[2].Tran(2) == trans[0] &&
-    cl.Clusters[2].Tran(3) == trans[3] &&
-    cl.Clusters[2].Tran(4) == trans[4])
+    storage.Cluster(1).GetTransaction(0) == trans[7] &&
+    storage.Cluster(1).GetTransaction(1) == trans[6] &&
+    storage.Cluster(1).GetTransaction(2) == trans[5] &&
+    storage.Cluster(2).GetTransaction(0) == trans[2] &&
+    storage.Cluster(2).GetTransaction(1) == trans[1] &&
+    storage.Cluster(2).GetTransaction(2) == trans[0] &&
+    storage.Cluster(2).GetTransaction(3) == trans[3] &&
+    storage.Cluster(2).GetTransaction(4) == trans[4])
 
   if !clusterCheck {
-    cl.Print()
+    storage.Print()
     t.Error("Not valid clusters")
   }
 }
@@ -58,17 +59,18 @@ func TestWithOtherOrders(t *testing.T) {
 
   input   := io.NewMemoryInput(&trans)
   output  := io.NewMemoryOutput()
-  process := NewProcess(input, output, 3.0)
+  storage := store.NewMemoryStore()
+  process := NewProcess(input, output, storage, 3.0)
   process.Build()
 
   clusterCheck := (
-    cl.Clusters[1].Tran(0) == trans[3] &&
-    cl.Clusters[1].Tran(1) == trans[2] &&
-    cl.Clusters[2].Tran(0) == trans[0] &&
-    cl.Clusters[2].Tran(1) == trans[1])
+    storage.Cluster(1).GetTransaction(0) == trans[3] &&
+    storage.Cluster(1).GetTransaction(1) == trans[2] &&
+    storage.Cluster(2).GetTransaction(0) == trans[0] &&
+    storage.Cluster(2).GetTransaction(1) == trans[1])
 
   if !clusterCheck {
-    cl.Print()
+    storage.Print()
     t.Error("Not valid clusters")
   }
 }
@@ -86,8 +88,9 @@ func TestWithUniqTransactions(t *testing.T) {
 
   input   := io.NewMemoryInput(&trans)
   output  := io.NewMemoryOutput()
-  process := NewProcess(input, output, 3.325)
+  storage := store.NewMemoryStore()
+  process := NewProcess(input, output, storage, 3.325)
   process.Build()
 
-  cl.Print()
+  storage.Print()
 }

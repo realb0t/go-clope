@@ -11,15 +11,17 @@ type ClusterStore interface {
   CreateCluster() *cluster.Cluster
   // Add or move transaction into cluster by clusterId
   // and commit changes in store
-  MoveTransaction(clusterId int, trans *transaction.Transaction) *cluster.Cluster
+  MoveTransaction(clusterId int, trans *transaction.Transaction)
   // Remove all empty clusters from store
   RemoveEmpty()
-  // Get all clusters
-  GetClusters()
+  // Iterate all clusters
+  Iterate(callback func(*cluster.Cluster))
   // Length all clusters
-  Len()
+  Len() int
   // Output all store
   Print()
+  // Get cluster by id
+  Cluster(id int) *cluster.Cluster
 }
 
 type MemoryStore struct {
@@ -32,8 +34,14 @@ func NewMemoryStore() *MemoryStore {
   return &MemoryStore{make(map[int]*cluster.Cluster, 0), 1}
 }
 
-func (s *MemoryStore) GetClusters() map[int]*cluster.Cluster {
-  return s.clusters
+func (s *MemoryStore) Iterate(callback func(*cluster.Cluster)) {
+  for _, cluster := range(s.clusters) {
+    callback(cluster)
+  }
+}
+
+func (s *MemoryStore) Cluster(id int) *cluster.Cluster {
+  return s.clusters[id]
 }
 
 func (s *MemoryStore) Len() int {
