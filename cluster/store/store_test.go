@@ -24,7 +24,7 @@ func TestRemoveEmpty(t *testing.T) {
   trans := trn.Make( "a", "d" )
   _ = s.CreateCluster()
   secondCluster := s.CreateCluster()
-  secondCluster.MoveTransaction(trans)
+  s.MoveTransaction(secondCluster.Id, trans)
 
   if len(s.Clusters) != 2 {
     t.Error("Clusters count uncorrect before remove", len(s.Clusters))

@@ -1,17 +1,19 @@
-package cluster
+package cluster_test
 
 import (
   "testing"
+  "github.com/realb0t/go-clope/cluster"
+  "github.com/realb0t/go-clope/cluster/store"
   trn "github.com/realb0t/go-clope/transaction"
 )
 
 func TestNewCluster(t *testing.T) {
-  Reset()
-  _ = NewCluster(1)
+  _ = cluster.NewCluster(1)
 }
 
 func TestDeltaAddEvaluative(t *testing.T) {
   r := 2.6
+  s := store.NewMemoryStore()
 
   trans := []*trn.Transaction{
     trn.Make( "a", "b" ),
@@ -21,19 +23,19 @@ func TestDeltaAddEvaluative(t *testing.T) {
     trn.Make( "d", "e", "f" ),
   }
 
-  clusters := []*Cluster{ AddCluster(),
-    AddCluster(), AddCluster(), AddCluster() }
+  clusters := []*cluster.Cluster{  s.CreateCluster(),
+    s.CreateCluster(), s.CreateCluster(), s.CreateCluster() }
 
-  clusters[0].MoveTransaction(trans[0])
-  clusters[0].MoveTransaction(trans[1])
-  clusters[0].MoveTransaction(trans[2])
-  clusters[1].MoveTransaction(trans[3])
-  clusters[1].MoveTransaction(trans[4])
-  clusters[2].MoveTransaction(trans[0])
-  clusters[2].MoveTransaction(trans[1])
-  clusters[3].MoveTransaction(trans[2])
-  clusters[3].MoveTransaction(trans[3])
-  clusters[3].MoveTransaction(trans[4])
+  s.MoveTransaction(clusters[0].Id, trans[0])
+  s.MoveTransaction(clusters[0].Id, trans[1])
+  s.MoveTransaction(clusters[0].Id, trans[2])
+  s.MoveTransaction(clusters[1].Id, trans[3])
+  s.MoveTransaction(clusters[1].Id, trans[4])
+  s.MoveTransaction(clusters[2].Id, trans[0])
+  s.MoveTransaction(clusters[2].Id, trans[1])
+  s.MoveTransaction(clusters[3].Id, trans[2])
+  s.MoveTransaction(clusters[3].Id, trans[3])
+  s.MoveTransaction(clusters[3].Id, trans[4])
 
   if clusters[0].DeltaAdd(trans[0], r) <= clusters[3].DeltaAdd(trans[0], r) {
     t.Error("Bad DeltaAdd for first compare")
