@@ -119,7 +119,7 @@ func (c *Cluster) refresh() {
 }
 
 // Удаление транзакции из кластера
-func (c *Cluster) removeTransaction(t *trn.Transaction) {
+func (c *Cluster) RemoveTransaction(t *trn.Transaction) {
   ei := -1
 
   // Опеределяем индекс данной транзакции
@@ -139,21 +139,25 @@ func (c *Cluster) removeTransaction(t *trn.Transaction) {
   }
 }
 
-// Добавление/Перемещение транзакции в кластер
-func (c *Cluster) MoveTransaction(t *trn.Transaction) {
+func (c *Cluster) AddTransaction(t *trn.Transaction) {
   // Добавляем транзакцию к текущему кластеру
   c.transactions = append(c.transactions, t)
   // Обновляем кластерные характеристики
   c.refreshAtomsAfterAdd(t)
   c.refresh()
-  // Если для транзакции был определен кластер
-  if t.ClusterId != -1 {
-    // Удаляем транзакцию из старого кластера
-    Clusters[t.ClusterId].removeTransaction(t)
-  }
   // и переключаем указатель кластера в транзакции
   // на текущий кластер
   t.ClusterId = c.Id
+}
+
+// Добавление/Перемещение транзакции в кластер
+func (c *Cluster) MoveTransaction(t *trn.Transaction) {
+  // Если для транзакции был определен кластер
+  if t.ClusterId != -1 {
+    // Удаляем транзакцию из старого кластера
+    Clusters[t.ClusterId].RemoveTransaction(t)
+  }
+  c.AddTransaction(t)
 }
 
 // Подсчет дельта-веса при добавлении транзакции в кластер
