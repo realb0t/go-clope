@@ -23,7 +23,7 @@ type ClusterStore interface {
 }
 
 type MemoryStore struct {
-  Clusters map[int]*cluster.Cluster
+  clusters map[int]*cluster.Cluster
   nextId int
 }
 
@@ -33,19 +33,19 @@ func NewMemoryStore() *MemoryStore {
 }
 
 func (s *MemoryStore) GetClusters() map[int]*cluster.Cluster {
-  return s.Clusters
+  return s.clusters
 }
 
 func (s *MemoryStore) Len() int {
-  return len(s.Clusters)
+  return len(s.clusters)
 }
 
 // Create new cluster in store and commit in store
 func (s *MemoryStore) CreateCluster() *cluster.Cluster {
   curId := s.nextId
   s.nextId++
-  s.Clusters[curId] = cluster.NewCluster(curId)
-  return s.Clusters[curId]
+  s.clusters[curId] = cluster.NewCluster(curId)
+  return s.clusters[curId]
 }
 
   // Add or move transaction into cluster by clusterId
@@ -54,21 +54,21 @@ func (s *MemoryStore) MoveTransaction(cId int, t *transaction.Transaction) {
   // Если для транзакции был определен кластер
   if t.ClusterId != -1 {
     // Удаляем транзакцию из старого кластера
-    s.Clusters[t.ClusterId].RemoveTransaction(t)
+    s.clusters[t.ClusterId].RemoveTransaction(t)
   }
-  s.Clusters[cId].AddTransaction(t)
+  s.clusters[cId].AddTransaction(t)
 }
 
 func (s *MemoryStore) RemoveEmpty() {
-  for id, cluster := range(s.Clusters) {
+  for id, cluster := range(s.clusters) {
     if cluster.IsEmpty() {
-      delete(s.Clusters, id)
+      delete(s.clusters, id)
     }
   }
 }
 
 func (s *MemoryStore) Print() {
-  for _, cluster := range(s.Clusters) {
+  for _, cluster := range(s.clusters) {
     fmt.Println(cluster)
   }
 }
