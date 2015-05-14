@@ -108,8 +108,8 @@ type Output interface {
 
 ## TODO
 
+- Add Clusters store interface
 - Add MemoryOutput print interface
 - Abstract Transaction (with custom fields)
-- IO interface for Clusters
 - Apply decimal calculations
 - Create clustarization testing tools
