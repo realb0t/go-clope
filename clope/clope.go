@@ -5,6 +5,7 @@ import (
   "math"
   "github.com/realb0t/go-clope/io"
   clu "github.com/realb0t/go-clope/cluster"
+  "github.com/realb0t/go-clope/cluster/store"
   tsn "github.com/realb0t/go-clope/transaction"
 )
 
@@ -12,12 +13,13 @@ import (
 type Process struct {
   input io.Input
   output io.Output
+  store store.ClusterStore
   r float64
 }
 
 // Создание нового процесса
-func NewProcess(input io.Input, output io.Output, r float64) *Process {
-  return &Process{input, output, r}
+func NewProcess(input io.Input, output io.Output, store store.ClusterStore, r float64) *Process {
+  return &Process{input, output, store, r}
 }
 
 type SyncMsg struct {
@@ -30,26 +32,25 @@ type SyncMsg struct {
 func (p *Process) BestClusterFor(t *tsn.Transaction) *clu.Cluster {
   var bestCluster *clu.Cluster
 
-  if len(clu.Clusters) > 0 {
+  if p.store.Len() > 0 {
     var wg sync.WaitGroup
     tempW := float64(len(t.Atoms))
     tempS := tempW
     deltaMax := tempS / math.Pow(tempW, p.r)
     syncDelta := make(chan *SyncMsg)
 
-    wg.Add(len(clu.Clusters))
+    wg.Add(p.store.Len())
 
-    for _, cluster := range(clu.Clusters) {
+    p.store.Iterate(func(c *clu.Cluster) {
       go func(cluster *clu.Cluster) {
         defer wg.Done()
         curDelta := cluster.DeltaAdd(t, p.r)
         syncDelta <- &SyncMsg{Delta: curDelta, Cluster: cluster}
-      }(cluster)
-    }
+      }(c)
+    })
 
     go func() {
-      wg.Wait()
-      close(syncDelta)
+      wg.Wait() ; close(syncDelta)
     }()
 
     for msg := range syncDelta {
@@ -61,7 +62,7 @@ func (p *Process) BestClusterFor(t *tsn.Transaction) *clu.Cluster {
   }
 
   if bestCluster == nil {
-    bestCluster = clu.AddCluster()
+    bestCluster = p.store.CreateCluster()
   }
   return bestCluster
 }
@@ -70,7 +71,7 @@ func (p *Process) BestClusterFor(t *tsn.Transaction) *clu.Cluster {
 func (p *Process) Initialization() {
   for trans := p.input.Next(); trans != nil; trans = p.input.Next() {
     bestCluster := p.BestClusterFor(trans)
-    bestCluster.MoveTransaction(trans)
+    p.store.MoveTransaction(bestCluster.Id, trans)
     p.output.Write(trans)
   }
 }
@@ -87,7 +88,7 @@ func (p *Process) Iteration() {
       lastClusterId := trans.ClusterId
       bestCluster := p.BestClusterFor(trans)
       if bestCluster.Id != lastClusterId {
-        bestCluster.MoveTransaction(trans)
+        p.store.MoveTransaction(bestCluster.Id, trans)
         p.output.Write(trans)
         moved = true
       }
@@ -95,12 +96,11 @@ func (p *Process) Iteration() {
 
     if !moved { break }
   }
-  clu.RemoveEmpty()
+  p.store.RemoveEmpty()
 }
 
 // Построение размещения с одной итерацией
 func (p *Process) Build() {
-  clu.Reset()
   p.Initialization()
   p.Iteration()
 }

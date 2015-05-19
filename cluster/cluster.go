@@ -13,6 +13,10 @@ type Cluster struct {
   // @todo Возможно тут должна быть Map
   // чтобы нельзя было поместить в один кластер несколько
   // одинаковых транзакций
+  // @todo По возможности убрать хранение транзакций
+  // в кластере, т.к. нужно нормализовать хранение данных
+  // и при работе программы и исключить их дублирование
+  // (дублирование транзакций в кластере)
   transactions []*trn.Transaction // массив транзакций
   // Кластерные характеристики
   N int // кол-во транзакций
@@ -24,53 +28,24 @@ type Cluster struct {
   atoms map[*atom.Atom]int 
 }
 
-// Созданные кластеры
-var Clusters map[int]*Cluster
-var nextId = 1
-
-func Print() {
-  for _, cluster := range(Clusters) {
-    fmt.Println(cluster)
-  }
-}
-
-// Сбросить набор кластеров
-func Reset() {
-  Clusters = make(map[int]*Cluster, 0)
-  nextId = 1
-}
-
 // Создать новый кластер
 func NewCluster(id int) *Cluster {
   return &Cluster{id, make([]*trn.Transaction, 0), 0, 0, 0, make(map[*atom.Atom]int, 0)}
 }
 
-// Создать и Добавить новый кластер
-func AddCluster() *Cluster {
-  if Clusters == nil { Reset() }
-  curId := nextId
-  nextId++
-  Clusters[curId] = NewCluster(curId)
-  return Clusters[curId]
-}
-
-// Удаление пустых кластеров
-func RemoveEmpty() {
-  for id, cluster := range(Clusters) {
-    if cluster.isEmpty() {
-      delete(Clusters, id)
-    }
-  }
-}
-
 // Пустой ли кластер
-func (c *Cluster) isEmpty() bool {
+func (c *Cluster) IsEmpty() bool {
   return len(c.transactions) == 0
 }
 
-// Возвращает транзакцию по индексу
-func (c *Cluster) Tran(i int) *trn.Transaction {
+// Get transaction by index
+func (c *Cluster) GetTransaction(i int) *trn.Transaction {
   return c.transactions[i]
+}
+
+// Get all cluster transaction
+func (c *Cluster) GetTransactions() []*trn.Transaction {
+  return c.transactions
 }
 
 // Преобразование к строке
@@ -119,7 +94,7 @@ func (c *Cluster) refresh() {
 }
 
 // Удаление транзакции из кластера
-func (c *Cluster) removeTransaction(t *trn.Transaction) {
+func (c *Cluster) RemoveTransaction(t *trn.Transaction) {
   ei := -1
 
   // Опеределяем индекс данной транзакции
@@ -139,18 +114,12 @@ func (c *Cluster) removeTransaction(t *trn.Transaction) {
   }
 }
 
-// Добавление/Перемещение транзакции в кластер
-func (c *Cluster) MoveTransaction(t *trn.Transaction) {
+func (c *Cluster) AddTransaction(t *trn.Transaction) {
   // Добавляем транзакцию к текущему кластеру
   c.transactions = append(c.transactions, t)
   // Обновляем кластерные характеристики
   c.refreshAtomsAfterAdd(t)
   c.refresh()
-  // Если для транзакции был определен кластер
-  if t.ClusterId != -1 {
-    // Удаляем транзакцию из старого кластера
-    Clusters[t.ClusterId].removeTransaction(t)
-  }
   // и переключаем указатель кластера в транзакции
   // на текущий кластер
   t.ClusterId = c.Id
