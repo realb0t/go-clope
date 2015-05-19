@@ -108,8 +108,8 @@ type Output interface {
 
 ## TODO
 
-- Add Clusters store interface
 - Add MemoryOutput print interface
+- Remove transactions array from cluster (normalize data models)
 - Abstract Transaction (with custom fields)
 - Apply decimal calculations
 - Create clustarization testing tools
