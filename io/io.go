@@ -6,12 +6,14 @@ import (
 
 // Интерфейс Ввода
 type Input interface {
+  // Pop next transaction in output/output
   Pop() *transaction.Transaction
 }
 
 // Интерфейс Вывода
 type Output interface {
   Input
+  // Add transaction in output
   Push(*transaction.Transaction)
 }
 
@@ -57,3 +59,4 @@ func (r *MemoryOutput) Pop() *transaction.Transaction {
 func (r *MemoryOutput) Push(trans *transaction.Transaction) {
   r.Data = append(r.Data, trans)
 }
+
