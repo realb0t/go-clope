@@ -69,10 +69,10 @@ func (p *Process) BestClusterFor(t *tsn.Transaction) *clu.Cluster {
 
 // Инициализация первоначального размещения
 func (p *Process) Initialization() {
-  for trans := p.input.Next(); trans != nil; trans = p.input.Next() {
+  for trans := p.input.Pop(); trans != nil; trans = p.input.Pop() {
     bestCluster := p.BestClusterFor(trans)
     p.store.MoveTransaction(bestCluster.Id, trans)
-    p.output.Write(trans)
+    p.output.Push(trans)
   }
 }
 
@@ -84,12 +84,12 @@ func (p *Process) Iteration() {
   for {
     moved := false
 
-    for trans := p.output.Next(); trans != nil; trans = p.output.Next() {
+    for trans := p.output.Pop(); trans != nil; trans = p.output.Pop() {
       lastClusterId := trans.ClusterId
       bestCluster := p.BestClusterFor(trans)
       if bestCluster.Id != lastClusterId {
         p.store.MoveTransaction(bestCluster.Id, trans)
-        p.output.Write(trans)
+        p.output.Push(trans)
         moved = true
       }
     }

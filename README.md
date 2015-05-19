@@ -40,7 +40,7 @@ func main() {
   // All created clusters in map[*atom.Atom]int 
   // cluster.Clusters
 
-  // All transaction with clusters put to IO.Output.Write
+  // All transaction with clusters put to IO.Output.Push
 
   // Print created clusters
   cluster.Print()
@@ -53,7 +53,7 @@ Output:
 [2] - [[a c d] [a b c] [a b] [d e] [d e f]]
 ```
 
-Output Next/Write can include into DB-transaction.
+Output Pop/Push can include into DB-transaction.
 
 ## Data Structures
 
@@ -69,9 +69,9 @@ Example: `gender:female`, `income:site-from.com`, etc.
 Package `go-clope/clope` have struct `clope.Process` with three methods:
 `Initialization`, `Iteration` and `Build`.
 
-Method `Initialization` build first clusters structure by transactions from **Input**. And write linked transactions into **Output**.
+Method `Initialization` build first clusters structure by transactions from **Input**. And Push linked transactions into **Output**.
 
-Method `Iteration` transactions distributes between clusters. And write transactions into **Output**.
+Method `Iteration` transactions distributes between clusters. And Push transactions into **Output**.
 
 Method `Build` call clusters reset and call `Initialization` and `Iteration`.
 
@@ -94,15 +94,15 @@ You can create other IO structures for other data stores (PostgreSQL, MongoDB, R
 Your IO structures must implement for interface:
 ```go
 type Input interface {
-  // Pop next transaction unlinked from data store.
-  Next() *transaction.Transaction
+  // Pop Pop transaction unlinked from data store.
+  Pop() *transaction.Transaction
 }
 
 type Output interface {
-  // Pop next linked (to cluster) transaction. After initialization process.
+  // Pop Pop linked (to cluster) transaction. After initialization process.
   Input
-  // Write linked (to cluster) transaction into data store.
-  Write(*transaction.Transaction)
+  // Push linked (to cluster) transaction into data store.
+  Push(*transaction.Transaction)
 }
 ```
 

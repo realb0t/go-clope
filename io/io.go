@@ -6,13 +6,13 @@ import (
 
 // Интерфейс Ввода
 type Input interface {
-  Next() *transaction.Transaction
+  Pop() *transaction.Transaction
 }
 
 // Интерфейс Вывода
 type Output interface {
   Input
-  Write(*transaction.Transaction)
+  Push(*transaction.Transaction)
 }
 
 // Тестовый Ввода (test input)
@@ -36,7 +36,7 @@ func NewMemoryOutput() *MemoryOutput {
 }
 
 // Извлечь следующее значение из Ввода
-func (r *MemoryInput) Next() *transaction.Transaction {
+func (r *MemoryInput) Pop() *transaction.Transaction {
   lenData := len(r.data)
   if lenData == 0 { return nil }
   var trans *transaction.Transaction
@@ -45,7 +45,7 @@ func (r *MemoryInput) Next() *transaction.Transaction {
 }
 
 // Извлечь следующее значение из Вывода
-func (r *MemoryOutput) Next() *transaction.Transaction {
+func (r *MemoryOutput) Pop() *transaction.Transaction {
   lenData := len(r.Data)
   if lenData == 0 { return nil }
   var trans *transaction.Transaction
@@ -54,6 +54,6 @@ func (r *MemoryOutput) Next() *transaction.Transaction {
 }
 
 // Записать значение в ввод и сбросить счетчик извлечения значений
-func (r *MemoryOutput) Write(trans *transaction.Transaction) {
+func (r *MemoryOutput) Push(trans *transaction.Transaction) {
   r.Data = append(r.Data, trans)
 }
