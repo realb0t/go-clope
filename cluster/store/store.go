@@ -15,6 +15,7 @@ type ClusterStore interface {
   // Remove all empty clusters from store
   RemoveEmpty()
   // Iterate all clusters
+  // @todo Rename to IterateClusters
   Iterate(callback func(*cluster.Cluster))
   // Length all clusters
   Len() int

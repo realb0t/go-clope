@@ -17,6 +17,7 @@ import (
   "github.com/realb0t/go-clope/io"
   "github.com/realb0t/go-clope/transaction"
   "github.com/realb0t/go-clope/cluster"
+  "github.com/realb0t/go-clope/cluster/store"
 )
 
 func main() {
@@ -34,7 +35,8 @@ func main() {
   repulsion := 1.8
   input     := io.NewMemoryInput(&trans)
   output    := io.NewMemoryOutput()
-  process   := clope.NewProcess(input, output, repulsion)
+  storage   := store.MemoryStore()
+  process   := clope.NewProcess(input, output, store, repulsion)
   process.Build()
 
   // All created clusters in map[*atom.Atom]int 
@@ -43,7 +45,7 @@ func main() {
   // All transaction with clusters put to IO.Output.Push
 
   // Print created clusters
-  cluster.Print()
+  store.Print()
 }
 ```
 
@@ -63,6 +65,12 @@ Output Pop/Push can include into DB-transaction.
 Example: `gender:female`, `income:site-from.com`, etc.
 
 **Clusters** - map of all linked transaction.
+
+**Input** - is data-store source for transactions
+
+**Output** - is data-store for work algorythm. Before session is empty and after session is empty.
+
+**Store** - is data-store for storage results as array of clusters with linked transactions. 
 
 ## Usage
 
@@ -105,6 +113,10 @@ type Output interface {
   Push(*transaction.Transaction)
 }
 ```
+
+## Result store interface
+
+
 
 ## TODO
 
