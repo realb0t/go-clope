@@ -7,37 +7,37 @@ import (
   trn "github.com/realb0t/go-clope/transaction"
 )
 
-// Структура кластера
+// Cluster struct
 type Cluster struct {
   Id int // ID
-  // Кластерные характеристики
-  N int // кол-во транзакций
-  W int // кол-во уникальных объектов/атомов (или ширины кластера) 
-  S int // площади кластера
-  // Хеш атомов (элементов) кластера 
-  // Ключ - это Атом
-  // Значение - кол-во Атомов
+  // Cluster parameters
+  N int // Transaction quantity
+  W int // Quantity of uniq atoms (cluster width) 
+  S int // Area of cluster
+  // Map of atoms
+  // Key - Atom object
+  // Value - Atoms quantity
   atoms map[*atom.Atom]int
 }
 
-// Создать новый кластер
+// Create new enmpty cluster
 func NewCluster(id int) *Cluster {
   return &Cluster{id, 0, 0, 0, make(map[*atom.Atom]int, 0)}
 }
 
-// Преобразование к строке для подробного вывода
+// Inspect cluster
 func (c *Cluster) String() string {
   s := fmt.Sprintf("ID:%d;N:%d;W:%d;S:%d;%v", c.Id, c.N, c.W, c.S, c.atoms)
   return s
 }
 
-// Количество (частота) атомов в кластере
+// Atom quantity
 func (c *Cluster) Occ(atom *atom.Atom) int {
   return c.atoms[atom]
 }
 
-// Обновление хеша атомов кластера при добавлении транзакции
-func (c *Cluster) RefreshAtomsAfterAdd(t *trn.Transaction) {
+// Refresh cluster struct after add transaction
+func (c *Cluster) RefreshAfterAdd(t *trn.Transaction) {
   for _, atom := range(t.Atoms) {
     if count, ok := c.atoms[atom] ; ok {
       c.atoms[atom] = count + 1
@@ -45,11 +45,11 @@ func (c *Cluster) RefreshAtomsAfterAdd(t *trn.Transaction) {
       c.atoms[atom] = 1
     }
   }
-  // c.refresh(c.N + 1)
+  c.refresh(c.N + 1)
 }
 
-// Обновление хеша атомов кластера при удалении транзакции
-func (c *Cluster) RefreshAtomsAfterRemove(t *trn.Transaction) {
+// Refresh cluster struct after remove transaction
+func (c *Cluster) RefreshAfterRemove(t *trn.Transaction) {
   for _, atom := range(t.Atoms) {
     if count, ok := c.atoms[atom] ; ok {
       c.atoms[atom] = count - 1
@@ -58,11 +58,11 @@ func (c *Cluster) RefreshAtomsAfterRemove(t *trn.Transaction) {
       }
     }
   }
-  // c.refresh(c.N - 1)
+  c.refresh(c.N - 1)
 }
 
-// Обновление кластерных характеристик
-func (c *Cluster) Refresh(transCount int) {
+// Refresh cluster parameters
+func (c *Cluster) refresh(transCount int) {
   c.N = transCount
   c.W = len(c.atoms)
   c.S = 0
@@ -72,7 +72,7 @@ func (c *Cluster) Refresh(transCount int) {
   }
 }
 
-// Подсчет дельта-веса при добавлении транзакции в кластер
+// DeltaAdd calculation
 func (c *Cluster) DeltaAdd(t *trn.Transaction, r float64) float64 {
   transAtomsCount := len(t.Atoms)
   S_new := float64(c.S + transAtomsCount)

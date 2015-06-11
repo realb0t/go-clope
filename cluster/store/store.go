@@ -102,16 +102,14 @@ func (s *MemoryStore) RemoveTransaction(cId int, t *transaction.Transaction) {
     s.transactions[cId][len(s.transactions[cId])-1] = nil
     s.transactions[cId] = s.transactions[cId][:len(s.transactions[cId])-1]
 
-    s.clusters[cId].RefreshAtomsAfterRemove(t)
-    s.clusters[cId].Refresh(len(s.transactions[cId]))
+    s.clusters[cId].RefreshAfterRemove(t)
   }
 }
 
 // Add transaction into cluster
 func (s *MemoryStore) AddTransaction(cId int, t *transaction.Transaction) {
   s.transactions[cId] = append(s.transactions[cId], t)
-  s.clusters[cId].RefreshAtomsAfterAdd(t)
-  s.clusters[cId].Refresh(len(s.transactions[cId]))
+  s.clusters[cId].RefreshAfterAdd(t)
   t.ClusterId = cId
 }
 
