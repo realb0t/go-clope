@@ -34,14 +34,14 @@ func TestBuildIntegration(t *testing.T) {
   process := NewProcess(input, output, storage, 1.8)
   process.Build()
   clusterCheck := (
-    storage.Cluster(1).GetTransaction(0) == trans[7] &&
-    storage.Cluster(1).GetTransaction(1) == trans[6] &&
-    storage.Cluster(1).GetTransaction(2) == trans[5] &&
-    storage.Cluster(2).GetTransaction(0) == trans[2] &&
-    storage.Cluster(2).GetTransaction(1) == trans[1] &&
-    storage.Cluster(2).GetTransaction(2) == trans[0] &&
-    storage.Cluster(2).GetTransaction(3) == trans[3] &&
-    storage.Cluster(2).GetTransaction(4) == trans[4])
+    storage.ClusterTransactions(storage.Cluster(1))[0] == trans[7] &&
+    storage.ClusterTransactions(storage.Cluster(1))[1] == trans[6] &&
+    storage.ClusterTransactions(storage.Cluster(1))[2] == trans[5] &&
+    storage.ClusterTransactions(storage.Cluster(2))[0] == trans[2] &&
+    storage.ClusterTransactions(storage.Cluster(2))[1] == trans[1] &&
+    storage.ClusterTransactions(storage.Cluster(2))[2] == trans[0] &&
+    storage.ClusterTransactions(storage.Cluster(2))[3] == trans[3] &&
+    storage.ClusterTransactions(storage.Cluster(2))[4] == trans[4])
 
   if !clusterCheck {
     storage.Print()
@@ -64,10 +64,10 @@ func TestWithOtherOrders(t *testing.T) {
   process.Build()
 
   clusterCheck := (
-    storage.Cluster(1).GetTransaction(0) == trans[3] &&
-    storage.Cluster(1).GetTransaction(1) == trans[2] &&
-    storage.Cluster(2).GetTransaction(0) == trans[0] &&
-    storage.Cluster(2).GetTransaction(1) == trans[1])
+    storage.ClusterTransactions(storage.Cluster(1))[0] == trans[3] &&
+    storage.ClusterTransactions(storage.Cluster(1))[1] == trans[2] &&
+    storage.ClusterTransactions(storage.Cluster(2))[0] == trans[0] &&
+    storage.ClusterTransactions(storage.Cluster(2))[1] == trans[1])
 
   if !clusterCheck {
     storage.Print()

@@ -83,7 +83,6 @@ func (p *Process) Iteration() {
   
   for {
     moved := false
-
     for trans := p.output.Pop(); trans != nil; trans = p.output.Pop() {
       lastClusterId := trans.ClusterId
       bestCluster := p.BestClusterFor(trans)
@@ -94,7 +93,10 @@ func (p *Process) Iteration() {
       }
     }
 
-    if !moved { break }
+    if !moved { 
+      
+      break
+    }
   }
   p.store.RemoveEmpty()
 }
