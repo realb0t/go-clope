@@ -17,6 +17,7 @@ import (
   "github.com/realb0t/go-clope/io"
   "github.com/realb0t/go-clope/transaction"
   "github.com/realb0t/go-clope/cluster"
+  "github.com/realb0t/go-clope/cluster/store"
 )
 
 func main() {
@@ -34,16 +35,17 @@ func main() {
   repulsion := 1.8
   input     := io.NewMemoryInput(&trans)
   output    := io.NewMemoryOutput()
-  process   := clope.NewProcess(input, output, repulsion)
+  storage   := store.MemoryStore()
+  process   := clope.NewProcess(input, output, store, repulsion)
   process.Build()
 
   // All created clusters in map[*atom.Atom]int 
   // cluster.Clusters
 
-  // All transaction with clusters put to IO.Output.Write
+  // All transaction with clusters put to IO.Output.Push
 
   // Print created clusters
-  cluster.Print()
+  store.Print()
 }
 ```
 
@@ -53,7 +55,7 @@ Output:
 [2] - [[a c d] [a b c] [a b] [d e] [d e f]]
 ```
 
-Output Next/Write can include into DB-transaction.
+Output Pop/Push can include into DB-transaction.
 
 ## Data Structures
 
@@ -64,14 +66,20 @@ Example: `gender:female`, `income:site-from.com`, etc.
 
 **Clusters** - map of all linked transaction.
 
+**Input** - is data-store source for transactions
+
+**Output** - is data-store for work algorythm. Before session is empty and after session is empty.
+
+**Store** - is data-store for storage results as array of clusters with linked transactions. 
+
 ## Usage
 
 Package `go-clope/clope` have struct `clope.Process` with three methods:
 `Initialization`, `Iteration` and `Build`.
 
-Method `Initialization` build first clusters structure by transactions from **Input**. And write linked transactions into **Output**.
+Method `Initialization` build first clusters structure by transactions from **Input**. And Push linked transactions into **Output**.
 
-Method `Iteration` transactions distributes between clusters. And write transactions into **Output**.
+Method `Iteration` transactions distributes between clusters. And Push transactions into **Output**.
 
 Method `Build` call clusters reset and call `Initialization` and `Iteration`.
 
@@ -94,22 +102,25 @@ You can create other IO structures for other data stores (PostgreSQL, MongoDB, R
 Your IO structures must implement for interface:
 ```go
 type Input interface {
-  // Pop next transaction unlinked from data store.
-  Next() *transaction.Transaction
+  // Pop Pop transaction unlinked from data store.
+  Pop() *transaction.Transaction
 }
 
 type Output interface {
-  // Pop next linked (to cluster) transaction. After initialization process.
+  // Pop Pop linked (to cluster) transaction. After initialization process.
   Input
-  // Write linked (to cluster) transaction into data store.
-  Write(*transaction.Transaction)
+  // Push linked (to cluster) transaction into data store.
+  Push(*transaction.Transaction)
 }
 ```
 
+## Result store interface
+
+
+
 ## TODO
 
-- Add MemoryOutput print interface
-- Remove transactions array from cluster (normalize data models)
+- Add Store/Drivers for Cluster/Store for abstract mechanics of storage
 - Abstract Transaction (with custom fields)
 - Apply decimal calculations
 - Create clustarization testing tools
