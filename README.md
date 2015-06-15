@@ -1,5 +1,6 @@
 # go-clope
-Go lang implementation of [CLOPE](https://www.google.ru/search?q=clope) clusterization algorythm with parallel calculation and IO interfaces.
+
+Golang implementation of [CLOPE](https://www.google.ru/search?q=clope) clusterization algorythm with parallel calculation.
 
 ## Install and Run example
 
@@ -120,6 +121,7 @@ type Output interface {
 
 ## TODO
 
+- Storage interface methods with errors
 - Add Store/Drivers for Cluster/Store for abstract mechanics of storage
 - Abstract Transaction (with custom fields)
 - Apply decimal calculations
