@@ -33,15 +33,23 @@ func TestBuildIntegration(t *testing.T) {
   storage := store.NewMemoryStore()
   process := NewProcess(input, output, storage, 1.8)
   process.Build()
+
+  clusterTransactions := make(map[int][]*tr.Transaction, 0)
+  clusters := storage.Clusters()
+  for cId, cluster := range(clusters) {
+    clusterTransactions[cId], _ = storage.ClusterTransactions(cluster)
+  }
+
+
   clusterCheck := (
-    storage.ClusterTransactions(storage.Cluster(1))[0] == trans[7] &&
-    storage.ClusterTransactions(storage.Cluster(1))[1] == trans[6] &&
-    storage.ClusterTransactions(storage.Cluster(1))[2] == trans[5] &&
-    storage.ClusterTransactions(storage.Cluster(2))[0] == trans[2] &&
-    storage.ClusterTransactions(storage.Cluster(2))[1] == trans[1] &&
-    storage.ClusterTransactions(storage.Cluster(2))[2] == trans[0] &&
-    storage.ClusterTransactions(storage.Cluster(2))[3] == trans[3] &&
-    storage.ClusterTransactions(storage.Cluster(2))[4] == trans[4])
+    clusterTransactions[1][0] == trans[7] &&
+    clusterTransactions[1][1] == trans[6] &&
+    clusterTransactions[1][2] == trans[5] &&
+    clusterTransactions[2][0] == trans[2] &&
+    clusterTransactions[2][1] == trans[1] &&
+    clusterTransactions[2][2] == trans[0] &&
+    clusterTransactions[2][3] == trans[3] &&
+    clusterTransactions[2][4] == trans[4])
 
   if !clusterCheck {
     storage.Print()
@@ -63,11 +71,17 @@ func TestWithOtherOrders(t *testing.T) {
   process := NewProcess(input, output, storage, 3.0)
   process.Build()
 
+  clusterTransactions := make(map[int][]*tr.Transaction, 0)
+  clusters := storage.Clusters()
+  for cId, cluster := range(clusters) {
+    clusterTransactions[cId], _ = storage.ClusterTransactions(cluster)
+  }
+
   clusterCheck := (
-    storage.ClusterTransactions(storage.Cluster(1))[0] == trans[3] &&
-    storage.ClusterTransactions(storage.Cluster(1))[1] == trans[2] &&
-    storage.ClusterTransactions(storage.Cluster(2))[0] == trans[0] &&
-    storage.ClusterTransactions(storage.Cluster(2))[1] == trans[1])
+    clusterTransactions[1][0] == trans[3] &&
+    clusterTransactions[1][1] == trans[2] &&
+    clusterTransactions[2][0] == trans[0] &&
+    clusterTransactions[2][1] == trans[1])
 
   if !clusterCheck {
     storage.Print()
