@@ -23,9 +23,11 @@ type ClusterStore interface {
   Print()
   // Get cluster by id
   Cluster(id int) (*cluster.Cluster, error)
-  // Get Transactions for cluster id
+  // Get Transactions for Cluster
   ClusterTransactions(*cluster.Cluster) ([]*transaction.Transaction, error)
+  // Get All Transactions for All clusters as map
   Transactions() (map[int][]*transaction.Transaction, error)
+  // Get All Clusters
   Clusters() (map[int]*cluster.Cluster, error)
 }
 
