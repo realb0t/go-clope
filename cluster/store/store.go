@@ -25,7 +25,7 @@ type ClusterStore interface {
   Cluster(id int) (*cluster.Cluster, error)
   // Get Transactions for cluster id
   ClusterTransactions(*cluster.Cluster) ([]*transaction.Transaction, error)
-  Transactions() map[int][]*transaction.Transaction
+  Transactions() (map[int][]*transaction.Transaction, error)
   Clusters() (map[int]*cluster.Cluster, error)
 }
 
@@ -42,8 +42,8 @@ func NewMemoryStore() *MemoryStore {
   return &MemoryStore{clusters, trans, 1}
 }
 
-func (s *MemoryStore) Transactions() map[int][]*transaction.Transaction {
-  return s.transactions
+func (s *MemoryStore) Transactions() (map[int][]*transaction.Transaction, error) {
+  return s.transactions, nil
 }
 
 func (s *MemoryStore) Clusters() (map[int]*cluster.Cluster, error) {
