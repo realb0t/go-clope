@@ -22,7 +22,7 @@ type ClusterStore interface {
   // Output all store
   Print()
   // Get cluster by id
-  Cluster(id int) *cluster.Cluster
+  Cluster(id int) (*cluster.Cluster, error)
   // Get Transactions for cluster id
   ClusterTransactions(*cluster.Cluster) ([]*transaction.Transaction, error)
   Transactions() map[int][]*transaction.Transaction
@@ -60,8 +60,8 @@ func (s *MemoryStore) Iterate(callback func(*cluster.Cluster)) {
   }
 }
 
-func (s *MemoryStore) Cluster(id int) *cluster.Cluster {
-  return s.clusters[id]
+func (s *MemoryStore) Cluster(id int) (*cluster.Cluster, error) {
+  return s.clusters[id], nil
 }
 
 func (s *MemoryStore) Len() int {
