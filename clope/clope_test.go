@@ -35,11 +35,10 @@ func TestBuildIntegration(t *testing.T) {
   process.Build()
 
   clusterTransactions := make(map[int][]*tr.Transaction, 0)
-  clusters := storage.Clusters()
+  clusters, _ := storage.Clusters()
   for cId, cluster := range(clusters) {
     clusterTransactions[cId], _ = storage.ClusterTransactions(cluster)
   }
-
 
   clusterCheck := (
     clusterTransactions[1][0] == trans[7] &&
@@ -72,7 +71,7 @@ func TestWithOtherOrders(t *testing.T) {
   process.Build()
 
   clusterTransactions := make(map[int][]*tr.Transaction, 0)
-  clusters := storage.Clusters()
+  clusters, _ := storage.Clusters()
   for cId, cluster := range(clusters) {
     clusterTransactions[cId], _ = storage.ClusterTransactions(cluster)
   }
