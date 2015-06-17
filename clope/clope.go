@@ -62,7 +62,7 @@ func (p *Process) BestClusterFor(t *tsn.Transaction) *clu.Cluster {
   }
 
   if bestCluster == nil {
-    bestCluster = p.store.CreateCluster()
+    bestCluster, _ = p.store.CreateCluster()
   }
   return bestCluster
 }
@@ -94,11 +94,10 @@ func (p *Process) Iteration() {
     }
 
     if !moved { 
-      
       break
     }
   }
-  p.store.RemoveEmpty()
+  _ = p.store.RemoveEmpty()
 }
 
 // Построение размещения с одной итерацией

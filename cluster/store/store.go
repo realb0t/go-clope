@@ -8,12 +8,12 @@ import (
 
 type ClusterStore interface {
   // Create new cluster in store and commit in store
-  CreateCluster() *cluster.Cluster
+  CreateCluster() (*cluster.Cluster, error)
   // Add or move transaction into cluster by clusterId
   // and commit changes in store
   MoveTransaction(clusterId int, trans *transaction.Transaction)
   // Remove all empty clusters from store
-  RemoveEmpty()
+  RemoveEmpty() error
   // Iterate all clusters
   // @todo Rename to IterateClusters
   Iterate(callback func(*cluster.Cluster))
@@ -71,11 +71,11 @@ func (s *MemoryStore) Len() int {
 }
 
 // Create new cluster in store and commit in store
-func (s *MemoryStore) CreateCluster() *cluster.Cluster {
+func (s *MemoryStore) CreateCluster() (*cluster.Cluster, error) {
   curId := s.nextId
   s.nextId++
   s.clusters[curId] = cluster.NewCluster(curId)
-  return s.clusters[curId]
+  return s.clusters[curId], nil
 }
 
 // Add or move transaction into cluster by clusterId
@@ -115,12 +115,14 @@ func (s *MemoryStore) AddTransaction(cId int, t *transaction.Transaction) {
   t.ClusterId = cId
 }
 
-func (s *MemoryStore) RemoveEmpty() {
+func (s *MemoryStore) RemoveEmpty() error {
   for id, cluster := range(s.clusters) {
     if len(s.transactions[cluster.Id]) == 0 {
       delete(s.clusters, id)
     }
   }
+
+  return nil
 }
 
 func (s *MemoryStore) Print() {

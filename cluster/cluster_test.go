@@ -23,8 +23,11 @@ func TestDeltaAddEvaluative(t *testing.T) {
     trn.Make( "d", "e", "f" ),
   }
 
-  clusters := []*cluster.Cluster{  s.CreateCluster(),
-    s.CreateCluster(), s.CreateCluster(), s.CreateCluster() }
+  clusters := make([]*cluster.Cluster, 4)
+  clusters[0], _ = s.CreateCluster()
+  clusters[1], _ = s.CreateCluster()
+  clusters[2], _ = s.CreateCluster()
+  clusters[3], _ = s.CreateCluster()
 
   s.MoveTransaction(clusters[0].Id, trans[0])
   s.MoveTransaction(clusters[0].Id, trans[1])

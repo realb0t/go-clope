@@ -13,7 +13,7 @@ func TestNewProcess(t *testing.T) {
 
 func TestCreateCluster(t *testing.T) {
   s := store.NewMemoryStore()
-  _ = s.CreateCluster()
+  _, _ = s.CreateCluster()
   if s.Len() != 1 {
     t.Error("Clusters count not one")
   }
@@ -22,15 +22,15 @@ func TestCreateCluster(t *testing.T) {
 func TestRemoveEmpty(t *testing.T) {
   s := store.NewMemoryStore()
   trans := trn.Make( "a", "d" )
-  _ = s.CreateCluster()
-  secondCluster := s.CreateCluster()
+  _, _ = s.CreateCluster()
+  secondCluster, _ := s.CreateCluster()
   s.MoveTransaction(secondCluster.Id, trans)
 
   if s.Len() != 2 {
     t.Error("Clusters count uncorrect before remove", s.Len())
   }
 
-  s.RemoveEmpty()
+  _ = s.RemoveEmpty()
 
   if s.Len() != 1 {
     t.Error("Clusters count uncorrect after remove")
@@ -39,7 +39,7 @@ func TestRemoveEmpty(t *testing.T) {
 
 func TestMoveTransaction(t *testing.T) {
   s := store.NewMemoryStore()
-  cluster := s.CreateCluster()
+  cluster, _ := s.CreateCluster()
   trans1 := trn.Make( "a", "b", "c" )
   trans2 := trn.Make( "a", "d" )
   s.MoveTransaction(cluster.Id, trans1)
