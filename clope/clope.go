@@ -1,6 +1,7 @@
 package clope
 
 import (
+  "log"
   "sync"
   "math"
   "github.com/realb0t/go-clope/io"
@@ -29,8 +30,11 @@ type SyncMsg struct {
 
 // Выбирает Лучший кластер или Cоздает Новый кластер,
 // добавляет в него транзакцию и возвращает этот кластер
-func (p *Process) BestClusterFor(t *tsn.Transaction) *clu.Cluster {
-  var bestCluster *clu.Cluster
+func (p *Process) BestClusterFor(t *tsn.Transaction) (*clu.Cluster, error) {
+  var (
+    bestCluster *clu.Cluster
+    addError error
+  )
 
   if p.store.Len() > 0 {
     var wg sync.WaitGroup
@@ -62,30 +66,45 @@ func (p *Process) BestClusterFor(t *tsn.Transaction) *clu.Cluster {
   }
 
   if bestCluster == nil {
-    bestCluster, _ = p.store.CreateCluster()
+    bestCluster, addError = p.store.CreateCluster()
   }
-  return bestCluster
+  return bestCluster, addError
 }
 
 // Инициализация первоначального размещения
-func (p *Process) Initialization() {
+func (p *Process) Initialization() error {
+  var err error
+
   for trans := p.input.Pop(); trans != nil; trans = p.input.Pop() {
-    bestCluster := p.BestClusterFor(trans)
-    p.store.MoveTransaction(bestCluster.Id, trans)
+    bestCluster, err := p.BestClusterFor(trans)
+    if err == nil {
+      p.store.MoveTransaction(bestCluster.Id, trans)
+    }
     p.output.Push(trans)
+
+    if err != nil {
+      break
+    }
   }
+
+  return err;
 }
 
 // Итерация по размещению с целью наилучшего
 // расположения транзакций по кластерам
 // За одну итерацию перемещается одна транзакция
 func (p *Process) Iteration() {
-  
+
   for {
     moved := false
     for trans := p.output.Pop(); trans != nil; trans = p.output.Pop() {
       lastClusterId := trans.ClusterId
-      bestCluster := p.BestClusterFor(trans)
+      bestCluster, err := p.BestClusterFor(trans)
+      
+      if err != nil {
+        panic(err)
+      }
+
       if bestCluster.Id != lastClusterId {
         p.store.MoveTransaction(bestCluster.Id, trans)
         p.output.Push(trans)
@@ -97,11 +116,16 @@ func (p *Process) Iteration() {
       break
     }
   }
+
+  if x := recover(); x != nil {
+    log.Panicln(x)
+  }
+
   _ = p.store.RemoveEmpty()
 }
 
 // Построение размещения с одной итерацией
 func (p *Process) Build() {
-  p.Initialization()
+  _ = p.Initialization()
   p.Iteration()
 }
