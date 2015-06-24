@@ -1,6 +1,7 @@
 package clope
 
 import (
+  "errors"
   "log"
   "sync"
   "math"
@@ -87,13 +88,19 @@ func (p *Process) Initialization() error {
     }
   }
 
-  return err;
+  return err
 }
 
 // Итерация по размещению с целью наилучшего
 // расположения транзакций по кластерам
 // За одну итерацию перемещается одна транзакция
-func (p *Process) Iteration() {
+func (p *Process) Iteration() (e error) {
+  defer func() {
+    if err := recover(); err != nil {
+      log.Panicf("Iteration error %v\n", err)
+      e = errors.New( "Iteration error" )
+    }
+  }()
 
   for {
     moved := false
@@ -117,15 +124,16 @@ func (p *Process) Iteration() {
     }
   }
 
-  if x := recover(); x != nil {
-    log.Panicln(x)
-  }
-
-  _ = p.store.RemoveEmpty()
+  err := p.store.RemoveEmpty()
+  return err
 }
 
 // Построение размещения с одной итерацией
-func (p *Process) Build() {
-  _ = p.Initialization()
-  p.Iteration()
+func (p *Process) Build() error {
+  err := p.Initialization()
+  if err != nil {
+    return err
+  }
+
+  return p.Iteration()
 }
