@@ -20,9 +20,9 @@ func TestMemoryInputPop(t *testing.T) {
     tr.NewTransaction(a.NewAtoms([]string{ "c" })),
   }
   input := NewMemoryInput(&trans)
-  firstTrans := input.Pop()
-  secondTrans := input.Pop()
-  thirdTrans := input.Pop()
+  firstTrans, _ := input.Pop()
+  secondTrans, _ := input.Pop()
+  thirdTrans, _ := input.Pop()
 
   if firstTrans != trans[1] {
     t.Error("Pop transaction", firstTrans, " != ", trans[1] )
@@ -43,30 +43,30 @@ func TestMemoryOutputPush(t *testing.T) {
     tr.NewTransaction(a.NewAtoms([]string{ "c" })),
   }
   output := NewMemoryOutput()
-
-  if output.Pop() != nil {
+  res, _ := output.Pop()
+  if res != nil {
     t.Error("Not empty first Pop value")
   }
 
-  output.Push(trans[0])
-  output.Push(trans[1])
+  _ = output.Push(trans[0])
+  _ = output.Push(trans[1])
 
   if len(output.Data) != 2 {
     t.Error("Not correct data size")
   }
 
-  fPopTran := output.Pop()
+  fPopTran, _  := output.Pop()
   if fPopTran != trans[1] {
     t.Error("Pop transaction", fPopTran, " != ", trans[1] )
   }
 
-  sPopTran := output.Pop()
+  sPopTran, _ := output.Pop()
   if sPopTran != trans[0] {
     t.Error("Pop transaction", sPopTran, " != ", trans[0] )
   }
 
-  output.Push(fPopTran)
-  output.Push(sPopTran)
+  _ = output.Push(fPopTran)
+  _ = output.Push(sPopTran)
 
   if len(output.Data) != 2 {
     t.Error("Not correct data size")

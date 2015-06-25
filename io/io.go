@@ -5,16 +5,18 @@ import (
 )
 
 // Интерфейс Ввода
+// Очереди не обработанных объектов
 type Input interface {
   // Pop next transaction in output/output
-  Pop() *transaction.Transaction
+  Pop() (*transaction.Transaction, error)
 }
 
 // Интерфейс Вывода
+// Очереди объектов на обработку
 type Output interface {
   Input
   // Add transaction in output
-  Push(*transaction.Transaction)
+  Push(*transaction.Transaction) error
 }
 
 // Тестовый Ввода (test input)
@@ -38,25 +40,26 @@ func NewMemoryOutput() *MemoryOutput {
 }
 
 // Извлечь следующее значение из Ввода
-func (r *MemoryInput) Pop() *transaction.Transaction {
+func (r *MemoryInput) Pop() (*transaction.Transaction, error) {
   lenData := len(r.data)
-  if lenData == 0 { return nil }
+  if lenData == 0 { return nil, nil }
   var trans *transaction.Transaction
   trans, r.data = r.data[len(r.data)-1], r.data[:len(r.data)-1]
-  return trans
+  return trans, nil
 }
 
 // Извлечь следующее значение из Вывода
-func (r *MemoryOutput) Pop() *transaction.Transaction {
+func (r *MemoryOutput) Pop() (*transaction.Transaction, error) {
   lenData := len(r.Data)
-  if lenData == 0 { return nil }
+  if lenData == 0 { return nil, nil }
   var trans *transaction.Transaction
   trans, r.Data = r.Data[lenData-1], r.Data[:lenData-1]
-  return trans
+  return trans, nil
 }
 
 // Записать значение в ввод и сбросить счетчик извлечения значений
-func (r *MemoryOutput) Push(trans *transaction.Transaction) {
+func (r *MemoryOutput) Push(trans *transaction.Transaction) error {
   r.Data = append(r.Data, trans)
+  return nil
 }
 

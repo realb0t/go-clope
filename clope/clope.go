@@ -74,18 +74,18 @@ func (p *Process) BestClusterFor(t *tsn.Transaction) (*clu.Cluster, error) {
 
 // Инициализация первоначального размещения
 func (p *Process) Initialization() error {
-  var err error
+  var (
+    err error
+    trans *tsn.Transaction
+  )
 
-  for trans := p.input.Pop(); trans != nil; trans = p.input.Pop() {
+  for trans, err = p.input.Pop(); trans != nil && err == nil; trans, err = p.input.Pop() {
     bestCluster, err := p.BestClusterFor(trans)
     if err == nil {
       p.store.MoveTransaction(bestCluster.Id, trans)
     }
-    p.output.Push(trans)
-
-    if err != nil {
-      break
-    }
+    _ = p.output.Push(trans)
+    if err != nil { break }
   }
 
   return err
@@ -94,27 +94,25 @@ func (p *Process) Initialization() error {
 // Итерация по размещению с целью наилучшего
 // расположения транзакций по кластерам
 // За одну итерацию перемещается одна транзакция
-func (p *Process) Iteration() (e error) {
+func (p *Process) Iteration() (returnError error) {
   defer func() {
     if err := recover(); err != nil {
       log.Panicf("Iteration error %v\n", err)
-      e = errors.New( "Iteration error" )
+      returnError = errors.New( "Iteration error" )
     }
   }()
 
   for {
     moved := false
-    for trans := p.output.Pop(); trans != nil; trans = p.output.Pop() {
+    for trans, err := p.output.Pop(); trans != nil && err == nil; trans, err = p.output.Pop() {
       lastClusterId := trans.ClusterId
       bestCluster, err := p.BestClusterFor(trans)
       
-      if err != nil {
-        panic(err)
-      }
+      if err != nil { panic(err) }
 
       if bestCluster.Id != lastClusterId {
         p.store.MoveTransaction(bestCluster.Id, trans)
-        p.output.Push(trans)
+        _ = p.output.Push(trans)
         moved = true
       }
     }
