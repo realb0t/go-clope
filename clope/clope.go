@@ -77,14 +77,19 @@ func (p *Process) Initialization() error {
   var (
     err error
     trans *tsn.Transaction
+    bestCluster *clu.Cluster
   )
 
-  for trans, err = p.input.Pop(); trans != nil && err == nil; trans, err = p.input.Pop() {
-    bestCluster, err := p.BestClusterFor(trans)
-    if err == nil {
-      p.store.MoveTransaction(bestCluster.Id, trans)
-    }
-    _ = p.output.Push(trans)
+  for {
+    trans, err = p.input.Pop()
+    if err != nil { break }
+    if trans == nil { break }
+
+    bestCluster, err = p.BestClusterFor(trans)
+    if err != nil { break }
+
+    p.store.MoveTransaction(bestCluster.Id, trans)
+    err = p.output.Push(trans)
     if err != nil { break }
   }
 
@@ -97,29 +102,38 @@ func (p *Process) Initialization() error {
 func (p *Process) Iteration() (returnError error) {
   defer func() {
     if err := recover(); err != nil {
-      log.Panicf("Iteration error %v\n", err)
+      log.Panicf("Iteration Error: %v\n", err)
       returnError = errors.New( "Iteration error" )
     }
   }()
 
   for {
     moved := false
-    for trans, err := p.output.Pop(); trans != nil && err == nil; trans, err = p.output.Pop() {
+
+    var (
+      trans *tsn.Transaction
+      err error
+      bestCluster *clu.Cluster
+    )
+
+    for {
+      trans, err = p.output.Pop()
+      if err != nil { panic(err) }
+      if trans == nil { break }
+
       lastClusterId := trans.ClusterId
-      bestCluster, err := p.BestClusterFor(trans)
-      
+      bestCluster, err = p.BestClusterFor(trans)
       if err != nil { panic(err) }
 
       if bestCluster.Id != lastClusterId {
         p.store.MoveTransaction(bestCluster.Id, trans)
-        _ = p.output.Push(trans)
+        err = p.output.Push(trans)
+        if err != nil { panic(err) }
         moved = true
       }
     }
 
-    if !moved { 
-      break
-    }
+    if !moved { break }
   }
 
   err := p.store.RemoveEmpty()
@@ -130,8 +144,8 @@ func (p *Process) Iteration() (returnError error) {
 func (p *Process) Build() error {
   err := p.Initialization()
   if err != nil {
-    return err
+    log.Panicf("Initialization Error: %v\n", err)
+    return err 
   }
-
   return p.Iteration()
 }
