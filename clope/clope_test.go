@@ -2,7 +2,7 @@ package clope
 
 import (
   "testing"
-  "github.com/realb0t/go-clope/io"
+  io "github.com/realb0t/go-clope/io/memory"
   a "github.com/realb0t/go-clope/atom"
   tr "github.com/realb0t/go-clope/transaction"
   "github.com/realb0t/go-clope/cluster/store"

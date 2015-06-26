@@ -15,10 +15,10 @@ package clope_example
 
 import (
   "github.com/realb0t/go-clope/clope"
-  "github.com/realb0t/go-clope/io"
   "github.com/realb0t/go-clope/transaction"
   "github.com/realb0t/go-clope/cluster"
   "github.com/realb0t/go-clope/cluster/store"
+  io "github.com/realb0t/go-clope/io/memory"
 )
 
 func main() {
