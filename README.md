@@ -38,15 +38,14 @@ func main() {
   output    := io.NewMemoryOutput()
   storage   := store.MemoryStore()
   process   := clope.NewProcess(input, output, store, repulsion)
-  process.Build()
+  err       := process.Build()
 
-  // All created clusters in map[*atom.Atom]int 
-  // cluster.Clusters
-
-  // All transaction with clusters put to IO.Output.Push
+  if (err != nil) {
+    panic(err)
+  }
 
   // Print created clusters
-  store.Print()
+  storage.Print()
 }
 ```
 
@@ -87,7 +86,7 @@ Method `Build` call clusters reset and call `Initialization` and `Iteration`.
 Base usage:
 ```go
   process := clope.NewProcess(input, output, repulsion)
-  process.Build()
+  err := process.Build()
 ```
 
 After `Build` you can call again `Iteration`.
@@ -104,14 +103,14 @@ Your IO structures must implement for interface:
 ```go
 type Input interface {
   // Pop Pop transaction unlinked from data store.
-  Pop() *transaction.Transaction
+  Pop() (*transaction.Transaction, error)
 }
 
 type Output interface {
   // Pop Pop linked (to cluster) transaction. After initialization process.
   Input
   // Push linked (to cluster) transaction into data store.
-  Push(*transaction.Transaction)
+  Push(*transaction.Transaction) error
 }
 ```
 
