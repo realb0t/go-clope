@@ -121,7 +121,6 @@ type Output interface {
 
 ## TODO
 
-- Storage interface methods with errors
 - Add Store/Drivers for Cluster/Store for abstract mechanics of storage
 - Abstract Transaction (with custom fields)
 - Apply decimal calculations
