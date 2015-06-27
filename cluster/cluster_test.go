@@ -5,6 +5,7 @@ import (
   "github.com/realb0t/go-clope/cluster"
   "github.com/realb0t/go-clope/cluster/store"
   trn "github.com/realb0t/go-clope/transaction"
+  drv "github.com/realb0t/go-clope/cluster/store/driver/memory"
 )
 
 func TestNewCluster(t *testing.T) {
@@ -13,7 +14,8 @@ func TestNewCluster(t *testing.T) {
 
 func TestDeltaAddEvaluative(t *testing.T) {
   r := 2.6
-  s := store.NewMemoryStore()
+  d := drv.NewMemory()
+  s := store.NewStore(d)
 
   trans := []*trn.Transaction{
     trn.Make( "a", "b" ),

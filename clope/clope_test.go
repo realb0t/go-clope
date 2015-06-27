@@ -6,14 +6,20 @@ import (
   a "github.com/realb0t/go-clope/atom"
   tr "github.com/realb0t/go-clope/transaction"
   "github.com/realb0t/go-clope/cluster/store"
+  drv "github.com/realb0t/go-clope/cluster/store/driver/memory"
 )
 
 func TestNewProcess(t *testing.T) {
   trans := []*tr.Transaction{
     tr.NewTransaction(a.NewAtoms([]string{ "a" })),
   }
-  _ = NewProcess(io.NewMemoryInput(&trans),
-    io.NewMemoryOutput(), store.NewMemoryStore(), 1.0)
+
+  driver := drv.NewMemory()
+  store  := store.NewStore(driver)
+  input  := io.NewMemoryInput(&trans)
+  output := io.NewMemoryOutput()
+
+  _ = NewProcess(input, output, store, 1.0)
 }
 
 func TestBuildIntegration(t *testing.T) {
@@ -30,11 +36,12 @@ func TestBuildIntegration(t *testing.T) {
 
   input   := io.NewMemoryInput(&trans)
   output  := io.NewMemoryOutput()
-  storage := store.NewMemoryStore()
+  driver  := drv.NewMemory()
+  storage := store.NewStore(driver)
   process := NewProcess(input, output, storage, 1.8)
   process.Build()
 
-  clusterTransactions, _ := storage.Transactions()
+  clusterTransactions, _ := storage.Driver().Transactions()
   clusterCheck := (
     clusterTransactions[1][0] == trans[7] &&
     clusterTransactions[1][1] == trans[6] &&
@@ -61,11 +68,12 @@ func TestWithOtherOrders(t *testing.T) {
 
   input   := io.NewMemoryInput(&trans)
   output  := io.NewMemoryOutput()
-  storage := store.NewMemoryStore()
+  driver  := drv.NewMemory()
+  storage := store.NewStore(driver)
   process := NewProcess(input, output, storage, 3.0)
   process.Build()
 
-  clusterTransactions, _ := storage.Transactions()
+  clusterTransactions, _ := storage.Driver().Transactions()
   clusterCheck := (
     clusterTransactions[1][0] == trans[3] &&
     clusterTransactions[1][1] == trans[2] &&
@@ -91,7 +99,8 @@ func TestWithUniqTransactions(t *testing.T) {
 
   input   := io.NewMemoryInput(&trans)
   output  := io.NewMemoryOutput()
-  storage := store.NewMemoryStore()
+  driver  := drv.NewMemory()
+  storage := store.NewStore(driver)
   process := NewProcess(input, output, storage, 3.325)
   process.Build()
 

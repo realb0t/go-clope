@@ -15,13 +15,13 @@ import (
 type Process struct {
   input io.Input
   output io.Output
-  store store.ClusterStore
+  store *store.Store
   r float64
 }
 
 // Создание нового процесса
-func NewProcess(input io.Input, output io.Output, store store.ClusterStore, r float64) *Process {
-  return &Process{input, output, store, r}
+func NewProcess(input io.Input, output io.Output, str *store.Store, r float64) *Process {
+  return &Process{input, output, str, r}
 }
 
 type SyncMsg struct {
