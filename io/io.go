@@ -8,7 +8,7 @@ import (
 // Очереди не обработанных объектов
 type Input interface {
   // Pop next transaction in output/output
-  Pop() (*transaction.Transaction, error)
+  Pop() (transaction.Transaction, error)
 }
 
 // Интерфейс Вывода
@@ -16,5 +16,5 @@ type Input interface {
 type Output interface {
   Input
   // Add transaction in output
-  Push(*transaction.Transaction) error
+  Push(transaction.Transaction) error
 }

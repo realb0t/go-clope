@@ -31,7 +31,7 @@ type SyncMsg struct {
 
 // Выбирает Лучший кластер или Cоздает Новый кластер,
 // добавляет в него транзакцию и возвращает этот кластер
-func (p *Process) BestClusterFor(t *tsn.Transaction) (*clu.Cluster, error) {
+func (p *Process) BestClusterFor(t tsn.Transaction) (*clu.Cluster, error) {
   var (
     bestCluster *clu.Cluster
     addError error
@@ -39,7 +39,7 @@ func (p *Process) BestClusterFor(t *tsn.Transaction) (*clu.Cluster, error) {
 
   if p.store.Len() > 0 {
     var wg sync.WaitGroup
-    tempW := float64(len(t.Atoms))
+    tempW := float64(len(t.Atoms()))
     tempS := tempW
     deltaMax := tempS / math.Pow(tempW, p.r)
     syncDelta := make(chan *SyncMsg)
@@ -76,7 +76,7 @@ func (p *Process) BestClusterFor(t *tsn.Transaction) (*clu.Cluster, error) {
 func (p *Process) Initialization() error {
   var (
     err error
-    trans *tsn.Transaction
+    trans tsn.Transaction
     bestCluster *clu.Cluster
   )
 
@@ -111,7 +111,7 @@ func (p *Process) Iteration() (returnError error) {
     moved := false
 
     var (
-      trans *tsn.Transaction
+      trans tsn.Transaction
       err error
       bestCluster *clu.Cluster
     )
@@ -121,7 +121,7 @@ func (p *Process) Iteration() (returnError error) {
       if err != nil { panic(err) }
       if trans == nil { break }
 
-      lastClusterId := trans.ClusterId
+      lastClusterId := trans.GetClusterId()
       bestCluster, err = p.BestClusterFor(trans)
       if err != nil { panic(err) }
 

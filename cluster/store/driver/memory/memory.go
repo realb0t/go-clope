@@ -7,18 +7,18 @@ import (
 
 type Memory struct {
   clusters map[int]*cluster.Cluster
-  transactions map[int][]*transaction.Transaction
+  transactions map[int][]transaction.Transaction
   nextId int
 }
 
 // Create Memory instance
 func NewMemory() *Memory {
-  trans := make(map[int][]*transaction.Transaction, 0)
+  trans := make(map[int][]transaction.Transaction, 0)
   clusters := make(map[int]*cluster.Cluster, 0)
   return &Memory{clusters, trans, 1}
 }
 
-func (s *Memory) Transactions() (map[int][]*transaction.Transaction, error) {
+func (s *Memory) Transactions() (map[int][]transaction.Transaction, error) {
   return s.transactions, nil
 }
 
@@ -26,7 +26,7 @@ func (s *Memory) Clusters() (map[int]*cluster.Cluster, error) {
   return s.clusters, nil
 }
 
-func (s *Memory) ClusterTransactions(c *cluster.Cluster) ([]*transaction.Transaction, error) {
+func (s *Memory) ClusterTransactions(c *cluster.Cluster) ([]transaction.Transaction, error) {
   return s.transactions[c.Id], nil
 }
 
@@ -53,7 +53,7 @@ func (s *Memory) CreateCluster() (*cluster.Cluster, error) {
 }
 
 // Remove transaction from cluster
-func (s *Memory) RemoveTransaction(cId int, t *transaction.Transaction) {
+func (s *Memory) RemoveTransaction(cId int, t transaction.Transaction) {
   ei := -1
 
   // Опеределяем индекс данной транзакции
@@ -72,10 +72,10 @@ func (s *Memory) RemoveTransaction(cId int, t *transaction.Transaction) {
 }
 
 // Add transaction into cluster
-func (s *Memory) AddTransaction(cId int, t *transaction.Transaction) {
+func (s *Memory) AddTransaction(cId int, t transaction.Transaction) {
   s.transactions[cId] = append(s.transactions[cId], t)
   s.clusters[cId].RefreshAfterAdd(t)
-  t.ClusterId = cId
+  t.SetClusterId(cId)
 }
 
 func (s *Memory) RemoveEmpty() error {

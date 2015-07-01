@@ -114,9 +114,33 @@ type Output interface {
 }
 ```
 
-## Result store interface
+## Get Results
 
+Result storage is Cluster store and then driver.
 
+For get Clusters as `map[int]*cluster.Cluster`:
+```go
+  clusters, errors := storage.Driver().Clusters()
+```
+
+For iterate Clusters:
+```go
+  storage.Driver().Iterate(func(clu *cluster.Cluster) {
+    // ...
+  })
+```
+
+For acces for Cluster Transaction use Driver.ClusterTransactions function:
+```go
+  storage.Driver().Iterate(func(clu *cluster.Cluster) {
+    transactions := storage.Driver().ClusterTransactions(clu)
+  })
+```
+
+Or get all transaction as `map[int][]*transaction.Transaction`:
+```go
+  transactions, error := storage.Driver().Transactions()
+```
 
 ## TODO
 

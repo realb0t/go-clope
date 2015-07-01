@@ -18,9 +18,9 @@ func NewStore(drv driver.Driver) *Store {
 
 // Add or move transaction into cluster by clusterId
 // and commit changes in store
-func (s *Store) MoveTransaction(cId int, t *transaction.Transaction) {
+func (s *Store) MoveTransaction(cId int, t transaction.Transaction) {
   // Если для транзакции был определен кластер
-  if t.ClusterId != -1 {
+  if t.GetClusterId() != -1 {
     // Удаляем транзакцию из старого кластера
     s.driver.RemoveTransaction(cId, t)
   }

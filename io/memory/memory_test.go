@@ -7,7 +7,7 @@ import (
 )
 
 func TestNewMemoryInput(t *testing.T) {
-  _ = NewMemoryInput(&[]*tr.Transaction{})
+  _ = NewMemoryInput([]tr.Transaction{})
 }
 
 func TestNewMemoryOutput(t *testing.T) {
@@ -15,14 +15,15 @@ func TestNewMemoryOutput(t *testing.T) {
 }
 
 func TestMemoryInputPop(t *testing.T) {
-  trans := []*tr.Transaction{ 
-    tr.NewTransaction(a.NewAtoms([]string{ "a", "b" })),
-    tr.NewTransaction(a.NewAtoms([]string{ "c" })),
+  trans := []tr.Transaction{ 
+    tr.NewSimpleTransaction(a.NewAtoms([]string{ "a", "b" })),
+    tr.NewSimpleTransaction(a.NewAtoms([]string{ "c" })),
   }
-  input := NewMemoryInput(&trans)
-  firstTrans, _ := input.Pop()
+
+  input          := NewMemoryInput(trans)
+  firstTrans, _  := input.Pop()
   secondTrans, _ := input.Pop()
-  thirdTrans, _ := input.Pop()
+  thirdTrans, _  := input.Pop()
 
   if firstTrans != trans[1] {
     t.Error("Pop transaction", firstTrans, " != ", trans[1] )
@@ -38,9 +39,9 @@ func TestMemoryInputPop(t *testing.T) {
 }
 
 func TestMemoryOutputPush(t *testing.T) {
-  trans := []*tr.Transaction{ 
-    tr.NewTransaction(a.NewAtoms([]string{ "a", "b" })),
-    tr.NewTransaction(a.NewAtoms([]string{ "c" })),
+  trans := []tr.Transaction{ 
+    tr.NewSimpleTransaction(a.NewAtoms([]string{ "a", "b" })),
+    tr.NewSimpleTransaction(a.NewAtoms([]string{ "c" })),
   }
   output := NewMemoryOutput()
   res, _ := output.Pop()

@@ -10,20 +10,20 @@ import (
 )
 
 func TestNewProcess(t *testing.T) {
-  trans := []*tr.Transaction{
-    tr.NewTransaction(a.NewAtoms([]string{ "a" })),
+  trans := []tr.Transaction{
+    tr.NewSimpleTransaction(a.NewAtoms([]string{ "a" })),
   }
 
   driver := drv.NewMemory()
   store  := store.NewStore(driver)
-  input  := io.NewMemoryInput(&trans)
+  input  := io.NewMemoryInput(trans)
   output := io.NewMemoryOutput()
 
   _ = NewProcess(input, output, store, 1.0)
 }
 
 func TestBuildIntegration(t *testing.T) {
-  trans := []*tr.Transaction{ 
+  trans := []tr.Transaction{ 
     tr.Make( "a", "b" ),
     tr.Make( "a", "b", "c" ),
     tr.Make( "a", "c", "d" ),
@@ -34,7 +34,7 @@ func TestBuildIntegration(t *testing.T) {
     tr.Make( "w", "o", "r", "l", "d" ),
   }
 
-  input   := io.NewMemoryInput(&trans)
+  input   := io.NewMemoryInput(trans)
   output  := io.NewMemoryOutput()
   driver  := drv.NewMemory()
   storage := store.NewStore(driver)
@@ -59,14 +59,14 @@ func TestBuildIntegration(t *testing.T) {
 }
 
 func TestWithOtherOrders(t *testing.T) {
-  trans := []*tr.Transaction{ 
+  trans := []tr.Transaction{ 
     tr.Make( "a", "b" ),
     tr.Make( "b", "a" ),
     tr.Make( "c", "d" ),
     tr.Make( "d", "c", "b" ),
   }
 
-  input   := io.NewMemoryInput(&trans)
+  input   := io.NewMemoryInput(trans)
   output  := io.NewMemoryOutput()
   driver  := drv.NewMemory()
   storage := store.NewStore(driver)
@@ -90,14 +90,14 @@ func TestWithUniqTransactions(t *testing.T) {
   t.SkipNow()
   // @todo Unskip after create testing tools
 
-  trans := []*tr.Transaction{ 
+  trans := []tr.Transaction{ 
     tr.MakeUniq( "a", "b", "a", "b", "c", "c" ),
     tr.MakeUniq( "c", "b", "b", "c", "a" ),
     tr.MakeUniq( "c", "d", "d", "c", "c", "d" ),
     tr.MakeUniq( "d", "c", "b", "d", "b" ),
   }
 
-  input   := io.NewMemoryInput(&trans)
+  input   := io.NewMemoryInput(trans)
   output  := io.NewMemoryOutput()
   driver  := drv.NewMemory()
   storage := store.NewStore(driver)

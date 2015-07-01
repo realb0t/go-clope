@@ -37,8 +37,9 @@ func (c *Cluster) Occ(atom *atom.Atom) int {
 }
 
 // Refresh cluster struct after add transaction
-func (c *Cluster) RefreshAfterAdd(t *trn.Transaction) {
-  for _, atom := range(t.Atoms) {
+func (c *Cluster) RefreshAfterAdd(t trn.Transaction) {
+  atoms := t.Atoms()
+  for _, atom := range(atoms) {
     if count, ok := c.atoms[atom] ; ok {
       c.atoms[atom] = count + 1
     } else {
@@ -49,8 +50,9 @@ func (c *Cluster) RefreshAfterAdd(t *trn.Transaction) {
 }
 
 // Refresh cluster struct after remove transaction
-func (c *Cluster) RefreshAfterRemove(t *trn.Transaction) {
-  for _, atom := range(t.Atoms) {
+func (c *Cluster) RefreshAfterRemove(t trn.Transaction) {
+  atoms := t.Atoms()
+  for _, atom := range(atoms) {
     if count, ok := c.atoms[atom] ; ok {
       c.atoms[atom] = count - 1
       if c.atoms[atom] == 0 {
@@ -73,13 +75,15 @@ func (c *Cluster) refresh(transCount int) {
 }
 
 // DeltaAdd calculation
-func (c *Cluster) DeltaAdd(t *trn.Transaction, r float64) float64 {
-  transAtomsCount := len(t.Atoms)
-  S_new := float64(c.S + transAtomsCount)
-  W_new := float64(c.W)
-  toCounter := transAtomsCount - 1
+func (c *Cluster) DeltaAdd(t trn.Transaction, r float64) float64 {
+  atoms           := t.Atoms()
+  transAtomsCount := len(atoms)
+  S_new           := float64(c.S + transAtomsCount)
+  W_new           := float64(c.W)
+  toCounter       := transAtomsCount - 1
+
   for i := 0; i < toCounter; i++ {
-    if _, ok := c.atoms[t.Atoms[i]]; !ok { W_new++; }
+    if _, ok := c.atoms[atoms[i]]; !ok { W_new++; }
   }
 
   if c.N == 0 {

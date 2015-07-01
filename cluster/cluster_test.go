@@ -17,7 +17,7 @@ func TestDeltaAddEvaluative(t *testing.T) {
   d := drv.NewMemory()
   s := store.NewStore(d)
 
-  trans := []*trn.Transaction{
+  trans := []trn.Transaction{
     trn.Make( "a", "b" ),
     trn.Make( "a", "b", "c" ),
     trn.Make( "a", "c", "d" ),
