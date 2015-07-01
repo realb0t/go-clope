@@ -7,7 +7,7 @@ import (
 )
 
 func TestNewMemoryInput(t *testing.T) {
-  _ = NewMemoryInput([]tr.Transaction{})
+  _ = NewMemoryInput(&[]tr.Transaction{})
 }
 
 func TestNewMemoryOutput(t *testing.T) {
@@ -20,7 +20,7 @@ func TestMemoryInputPop(t *testing.T) {
     tr.NewSimpleTransaction(a.NewAtoms([]string{ "c" })),
   }
 
-  input          := NewMemoryInput(trans)
+  input          := NewMemoryInput(&trans)
   firstTrans, _  := input.Pop()
   secondTrans, _ := input.Pop()
   thirdTrans, _  := input.Pop()

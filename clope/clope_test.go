@@ -16,7 +16,7 @@ func TestNewProcess(t *testing.T) {
 
   driver := drv.NewMemory()
   store  := store.NewStore(driver)
-  input  := io.NewMemoryInput(trans)
+  input  := io.NewMemoryInput(&trans)
   output := io.NewMemoryOutput()
 
   _ = NewProcess(input, output, store, 1.0)
@@ -34,7 +34,7 @@ func TestBuildIntegration(t *testing.T) {
     tr.Make( "w", "o", "r", "l", "d" ),
   }
 
-  input   := io.NewMemoryInput(trans)
+  input   := io.NewMemoryInput(&trans)
   output  := io.NewMemoryOutput()
   driver  := drv.NewMemory()
   storage := store.NewStore(driver)
@@ -66,7 +66,7 @@ func TestWithOtherOrders(t *testing.T) {
     tr.Make( "d", "c", "b" ),
   }
 
-  input   := io.NewMemoryInput(trans)
+  input   := io.NewMemoryInput(&trans)
   output  := io.NewMemoryOutput()
   driver  := drv.NewMemory()
   storage := store.NewStore(driver)
@@ -97,7 +97,7 @@ func TestWithUniqTransactions(t *testing.T) {
     tr.MakeUniq( "d", "c", "b", "d", "b" ),
   }
 
-  input   := io.NewMemoryInput(trans)
+  input   := io.NewMemoryInput(&trans)
   output  := io.NewMemoryOutput()
   driver  := drv.NewMemory()
   storage := store.NewStore(driver)
