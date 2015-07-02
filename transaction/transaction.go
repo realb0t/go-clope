@@ -18,6 +18,7 @@ type Transaction interface {
 }
 
 // Transaction without addition attributes
+// for tests
 type SimpleTransaction struct {
   atoms []*atom.Atom // Атомы транзакции
   clusterId int
@@ -40,24 +41,22 @@ func (t *SimpleTransaction) SetClusterId(clusterId int) Transaction {
   return t
 }
 
-// Создает новую непривязанную транзакцию
+// Create new simple transaction
 func NewSimpleTransaction(atoms []*atom.Atom) Transaction {
   return &SimpleTransaction{atoms, -1}
 }
 
-// Создает транзакцию по набору String парамеров
+// Construct transactions by strings parameters
 func Make(stringAtoms ...string) Transaction {
   return NewSimpleTransaction(atom.NewAtoms(stringAtoms))
 }
 
-// Создает транзакцию с уникальным набором атомов
-// по набору String парамеров
+// Construct transactions with uniq atoms by strings parameters
 func MakeUniq(stringAtoms ...string) Transaction {
   return NewUniqTransaction(atom.NewAtoms(stringAtoms))
 }
 
-// Создание новой транзакции из массива атомов
-// новая транзакция не имеет состоит из уникальных атомов
+// Create new simple transaction with uniq atoms
 func NewUniqTransaction(atoms []*atom.Atom) Transaction {
   uniqAtoms := make([]*atom.Atom, 0)
   atomsMap := make(map[*atom.Atom]bool, 0)
