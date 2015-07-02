@@ -5,15 +5,19 @@ import (
   "github.com/realb0t/go-clope/atom"
 )
 
-// Структура транзакции
+// Transaction interface
 type Transaction interface {
+  // Return atoms array
   Atoms() []*atom.Atom
+  // Inspect
   String() string
+  // Get current cluster id
   GetClusterId() int
+  // Set transaction cluster id
   SetClusterId(int) Transaction
 }
 
-// Структура транзакции
+// Transaction without addition attributes
 type SimpleTransaction struct {
   atoms []*atom.Atom // Атомы транзакции
   clusterId int

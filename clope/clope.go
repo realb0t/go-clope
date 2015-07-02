@@ -11,7 +11,7 @@ import (
   "github.com/realb0t/go-clope/transaction"
 )
 
-// Структура процесса
+// Process struct
 type Process struct {
   input io.Input
   output io.Output
@@ -19,7 +19,7 @@ type Process struct {
   r float64
 }
 
-// Создание нового процесса
+// Create new process
 func NewProcess(input io.Input, output io.Output, str *store.Store, r float64) *Process {
   return &Process{input, output, str, r}
 }
@@ -29,8 +29,9 @@ type SyncMsg struct {
   Cluster *cluster.Cluster
 }
 
-// Выбирает Лучший кластер или Cоздает Новый кластер,
-// добавляет в него транзакцию и возвращает этот кластер
+// Choose the best cluster for given transaction or create
+// new cluster for than. Add given transaction in Best cluster 
+// and return that.
 func (p *Process) BestClusterFor(t transaction.Transaction) (*cluster.Cluster, error) {
   var (
     bestCluster *cluster.Cluster
@@ -72,7 +73,7 @@ func (p *Process) BestClusterFor(t transaction.Transaction) (*cluster.Cluster, e
   return bestCluster, addError
 }
 
-// Инициализация первоначального размещения
+// Initialize for first placing transaction into the clusters
 func (p *Process) Initialization() error {
   var (
     err error
@@ -96,9 +97,7 @@ func (p *Process) Initialization() error {
   return err
 }
 
-// Итерация по размещению с целью наилучшего
-// расположения транзакций по кластерам
-// За одну итерацию перемещается одна транзакция
+// Iteration for placing transactions into best clusters
 func (p *Process) Iteration() (returnError error) {
   defer func() {
     if err := recover(); err != nil {
@@ -140,7 +139,7 @@ func (p *Process) Iteration() (returnError error) {
   return err
 }
 
-// Построение размещения с одной итерацией
+// Build clusters with single iteration
 func (p *Process) Build() error {
   err := p.Initialization()
   if err != nil {
