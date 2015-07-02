@@ -6,9 +6,9 @@ import (
   "sync"
   "math"
   "github.com/realb0t/go-clope/io"
-  clu "github.com/realb0t/go-clope/cluster"
+  "github.com/realb0t/go-clope/cluster"
   "github.com/realb0t/go-clope/cluster/store"
-  tsn "github.com/realb0t/go-clope/transaction"
+  "github.com/realb0t/go-clope/transaction"
 )
 
 // Структура процесса
@@ -26,14 +26,14 @@ func NewProcess(input io.Input, output io.Output, str *store.Store, r float64) *
 
 type SyncMsg struct {
   Delta float64
-  Cluster *clu.Cluster
+  Cluster *cluster.Cluster
 }
 
 // Выбирает Лучший кластер или Cоздает Новый кластер,
 // добавляет в него транзакцию и возвращает этот кластер
-func (p *Process) BestClusterFor(t tsn.Transaction) (*clu.Cluster, error) {
+func (p *Process) BestClusterFor(t transaction.Transaction) (*cluster.Cluster, error) {
   var (
-    bestCluster *clu.Cluster
+    bestCluster *cluster.Cluster
     addError error
   )
 
@@ -46,11 +46,11 @@ func (p *Process) BestClusterFor(t tsn.Transaction) (*clu.Cluster, error) {
 
     wg.Add(p.store.Len())
 
-    p.store.Iterate(func(c *clu.Cluster) {
-      go func(cluster *clu.Cluster) {
+    p.store.Iterate(func(c *cluster.Cluster) {
+      go func(clu *cluster.Cluster) {
         defer wg.Done()
-        curDelta := cluster.DeltaAdd(t, p.r)
-        syncDelta <- &SyncMsg{Delta: curDelta, Cluster: cluster}
+        curDelta := clu.DeltaAdd(t, p.r)
+        syncDelta <- &SyncMsg{Delta: curDelta, Cluster: clu}
       }(c)
     })
 
@@ -76,8 +76,8 @@ func (p *Process) BestClusterFor(t tsn.Transaction) (*clu.Cluster, error) {
 func (p *Process) Initialization() error {
   var (
     err error
-    trans tsn.Transaction
-    bestCluster *clu.Cluster
+    trans transaction.Transaction
+    bestCluster *cluster.Cluster
   )
 
   for {
@@ -111,9 +111,9 @@ func (p *Process) Iteration() (returnError error) {
     moved := false
 
     var (
-      trans tsn.Transaction
+      trans transaction.Transaction
       err error
-      bestCluster *clu.Cluster
+      bestCluster *cluster.Cluster
     )
 
     for {

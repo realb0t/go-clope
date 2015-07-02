@@ -2,12 +2,12 @@ package memory
 
 import (
   "testing"
-  a "github.com/realb0t/go-clope/atom"
-  tr "github.com/realb0t/go-clope/transaction"
+  "github.com/realb0t/go-clope/atom"
+  "github.com/realb0t/go-clope/transaction"
 )
 
 func TestNewMemoryInput(t *testing.T) {
-  _ = NewMemoryInput(&[]tr.Transaction{})
+  _ = NewMemoryInput(&[]transaction.Transaction{})
 }
 
 func TestNewMemoryOutput(t *testing.T) {
@@ -15,9 +15,9 @@ func TestNewMemoryOutput(t *testing.T) {
 }
 
 func TestMemoryInputPop(t *testing.T) {
-  trans := []tr.Transaction{ 
-    tr.NewSimpleTransaction(a.NewAtoms([]string{ "a", "b" })),
-    tr.NewSimpleTransaction(a.NewAtoms([]string{ "c" })),
+  trans := []transaction.Transaction{ 
+    transaction.NewSimpleTransaction(atom.NewAtoms([]string{ "a", "b" })),
+    transaction.NewSimpleTransaction(atom.NewAtoms([]string{ "c" })),
   }
 
   input          := NewMemoryInput(&trans)
@@ -39,9 +39,9 @@ func TestMemoryInputPop(t *testing.T) {
 }
 
 func TestMemoryOutputPush(t *testing.T) {
-  trans := []tr.Transaction{ 
-    tr.NewSimpleTransaction(a.NewAtoms([]string{ "a", "b" })),
-    tr.NewSimpleTransaction(a.NewAtoms([]string{ "c" })),
+  trans := []transaction.Transaction{ 
+    transaction.NewSimpleTransaction(atom.NewAtoms([]string{ "a", "b" })),
+    transaction.NewSimpleTransaction(atom.NewAtoms([]string{ "c" })),
   }
   output := NewMemoryOutput()
   res, _ := output.Pop()

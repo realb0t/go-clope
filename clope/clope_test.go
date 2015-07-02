@@ -2,19 +2,19 @@ package clope
 
 import (
   "testing"
-  io "github.com/realb0t/go-clope/io/memory"
-  a "github.com/realb0t/go-clope/atom"
-  tr "github.com/realb0t/go-clope/transaction"
+  "github.com/realb0t/go-clope/atom"
+  "github.com/realb0t/go-clope/transaction"
   "github.com/realb0t/go-clope/cluster/store"
-  drv "github.com/realb0t/go-clope/cluster/store/driver/memory"
+  io "github.com/realb0t/go-clope/io/memory"
+  driver "github.com/realb0t/go-clope/cluster/store/driver/memory"
 )
 
 func TestNewProcess(t *testing.T) {
-  trans := []tr.Transaction{
-    tr.NewSimpleTransaction(a.NewAtoms([]string{ "a" })),
+  trans := []transaction.Transaction{
+    transaction.NewSimpleTransaction(atom.NewAtoms([]string{ "a" })),
   }
 
-  driver := drv.NewMemory()
+  driver := driver.NewMemory()
   store  := store.NewStore(driver)
   input  := io.NewMemoryInput(&trans)
   output := io.NewMemoryOutput()
@@ -23,20 +23,20 @@ func TestNewProcess(t *testing.T) {
 }
 
 func TestBuildIntegration(t *testing.T) {
-  trans := []tr.Transaction{ 
-    tr.Make( "a", "b" ),
-    tr.Make( "a", "b", "c" ),
-    tr.Make( "a", "c", "d" ),
-    tr.Make( "d", "e" ),
-    tr.Make( "d", "e", "f" ),
-    tr.Make( "h", "e", "l", "l", "o", " ", "w", "o", "r", "l", "d" ),
-    tr.Make( "h", "e", "l", "l", "o" ),
-    tr.Make( "w", "o", "r", "l", "d" ),
+  trans := []transaction.Transaction{ 
+    transaction.Make( "a", "b" ),
+    transaction.Make( "a", "b", "c" ),
+    transaction.Make( "a", "c", "d" ),
+    transaction.Make( "d", "e" ),
+    transaction.Make( "d", "e", "f" ),
+    transaction.Make( "h", "e", "l", "l", "o", " ", "w", "o", "r", "l", "d" ),
+    transaction.Make( "h", "e", "l", "l", "o" ),
+    transaction.Make( "w", "o", "r", "l", "d" ),
   }
 
   input   := io.NewMemoryInput(&trans)
   output  := io.NewMemoryOutput()
-  driver  := drv.NewMemory()
+  driver  := driver.NewMemory()
   storage := store.NewStore(driver)
   process := NewProcess(input, output, storage, 1.8)
   process.Build()
@@ -59,16 +59,16 @@ func TestBuildIntegration(t *testing.T) {
 }
 
 func TestWithOtherOrders(t *testing.T) {
-  trans := []tr.Transaction{ 
-    tr.Make( "a", "b" ),
-    tr.Make( "b", "a" ),
-    tr.Make( "c", "d" ),
-    tr.Make( "d", "c", "b" ),
+  trans := []transaction.Transaction{ 
+    transaction.Make( "a", "b" ),
+    transaction.Make( "b", "a" ),
+    transaction.Make( "c", "d" ),
+    transaction.Make( "d", "c", "b" ),
   }
 
   input   := io.NewMemoryInput(&trans)
   output  := io.NewMemoryOutput()
-  driver  := drv.NewMemory()
+  driver  := driver.NewMemory()
   storage := store.NewStore(driver)
   process := NewProcess(input, output, storage, 3.0)
   process.Build()
@@ -90,16 +90,16 @@ func TestWithUniqTransactions(t *testing.T) {
   t.SkipNow()
   // @todo Unskip after create testing tools
 
-  trans := []tr.Transaction{ 
-    tr.MakeUniq( "a", "b", "a", "b", "c", "c" ),
-    tr.MakeUniq( "c", "b", "b", "c", "a" ),
-    tr.MakeUniq( "c", "d", "d", "c", "c", "d" ),
-    tr.MakeUniq( "d", "c", "b", "d", "b" ),
+  trans := []transaction.Transaction{ 
+    transaction.MakeUniq( "a", "b", "a", "b", "c", "c" ),
+    transaction.MakeUniq( "c", "b", "b", "c", "a" ),
+    transaction.MakeUniq( "c", "d", "d", "c", "c", "d" ),
+    transaction.MakeUniq( "d", "c", "b", "d", "b" ),
   }
 
   input   := io.NewMemoryInput(&trans)
   output  := io.NewMemoryOutput()
-  driver  := drv.NewMemory()
+  driver  := driver.NewMemory()
   storage := store.NewStore(driver)
   process := NewProcess(input, output, storage, 3.325)
   process.Build()

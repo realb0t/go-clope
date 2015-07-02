@@ -4,7 +4,7 @@ import (
   "fmt"
   "math"
   "github.com/realb0t/go-clope/atom"
-  trn "github.com/realb0t/go-clope/transaction"
+  "github.com/realb0t/go-clope/transaction"
 )
 
 // Cluster struct
@@ -37,7 +37,7 @@ func (c *Cluster) Occ(atom *atom.Atom) int {
 }
 
 // Refresh cluster struct after add transaction
-func (c *Cluster) RefreshAfterAdd(t trn.Transaction) {
+func (c *Cluster) RefreshAfterAdd(t transaction.Transaction) {
   atoms := t.Atoms()
   for _, atom := range(atoms) {
     if count, ok := c.atoms[atom] ; ok {
@@ -50,7 +50,7 @@ func (c *Cluster) RefreshAfterAdd(t trn.Transaction) {
 }
 
 // Refresh cluster struct after remove transaction
-func (c *Cluster) RefreshAfterRemove(t trn.Transaction) {
+func (c *Cluster) RefreshAfterRemove(t transaction.Transaction) {
   atoms := t.Atoms()
   for _, atom := range(atoms) {
     if count, ok := c.atoms[atom] ; ok {
@@ -75,7 +75,7 @@ func (c *Cluster) refresh(transCount int) {
 }
 
 // DeltaAdd calculation
-func (c *Cluster) DeltaAdd(t trn.Transaction, r float64) float64 {
+func (c *Cluster) DeltaAdd(t transaction.Transaction, r float64) float64 {
   atoms           := t.Atoms()
   transAtomsCount := len(atoms)
   S_new           := float64(c.S + transAtomsCount)
