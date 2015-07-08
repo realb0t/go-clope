@@ -3,15 +3,16 @@ package clope
 import (
   "testing"
   "github.com/realb0t/go-clope/atom"
-  "github.com/realb0t/go-clope/transaction"
   "github.com/realb0t/go-clope/cluster/store"
+  "github.com/realb0t/go-clope/transaction"
+  "github.com/realb0t/go-clope/transaction/simple"
   io "github.com/realb0t/go-clope/io/memory"
   driver "github.com/realb0t/go-clope/cluster/store/driver/memory"
 )
 
 func TestNewProcess(t *testing.T) {
   trans := []transaction.Transaction{
-    transaction.NewSimpleTransaction(atom.NewAtoms([]string{ "a" })),
+    simple.NewSimple(atom.NewAtoms([]string{ "a" })),
   }
 
   driver := driver.NewMemory()
@@ -24,14 +25,14 @@ func TestNewProcess(t *testing.T) {
 
 func TestBuildIntegration(t *testing.T) {
   trans := []transaction.Transaction{ 
-    transaction.Make( "a", "b" ),
-    transaction.Make( "a", "b", "c" ),
-    transaction.Make( "a", "c", "d" ),
-    transaction.Make( "d", "e" ),
-    transaction.Make( "d", "e", "f" ),
-    transaction.Make( "h", "e", "l", "l", "o", " ", "w", "o", "r", "l", "d" ),
-    transaction.Make( "h", "e", "l", "l", "o" ),
-    transaction.Make( "w", "o", "r", "l", "d" ),
+    simple.Make( "a", "b" ),
+    simple.Make( "a", "b", "c" ),
+    simple.Make( "a", "c", "d" ),
+    simple.Make( "d", "e" ),
+    simple.Make( "d", "e", "f" ),
+    simple.Make( "h", "e", "l", "l", "o", " ", "w", "o", "r", "l", "d" ),
+    simple.Make( "h", "e", "l", "l", "o" ),
+    simple.Make( "w", "o", "r", "l", "d" ),
   }
 
   input   := io.NewMemoryInput(&trans)
@@ -39,7 +40,7 @@ func TestBuildIntegration(t *testing.T) {
   driver  := driver.NewMemory()
   storage := store.NewStore(driver)
   process := NewProcess(input, output, storage, 1.8)
-  process.Build()
+  _        = process.Build()
 
   clusterTransactions, _ := storage.Driver().Transactions()
   clusterCheck := (
@@ -60,10 +61,10 @@ func TestBuildIntegration(t *testing.T) {
 
 func TestWithOtherOrders(t *testing.T) {
   trans := []transaction.Transaction{ 
-    transaction.Make( "a", "b" ),
-    transaction.Make( "b", "a" ),
-    transaction.Make( "c", "d" ),
-    transaction.Make( "d", "c", "b" ),
+    simple.Make( "a", "b" ),
+    simple.Make( "b", "a" ),
+    simple.Make( "c", "d" ),
+    simple.Make( "d", "c", "b" ),
   }
 
   input   := io.NewMemoryInput(&trans)
@@ -91,10 +92,10 @@ func TestWithUniqTransactions(t *testing.T) {
   // @todo Unskip after create testing tools
 
   trans := []transaction.Transaction{ 
-    transaction.MakeUniq( "a", "b", "a", "b", "c", "c" ),
-    transaction.MakeUniq( "c", "b", "b", "c", "a" ),
-    transaction.MakeUniq( "c", "d", "d", "c", "c", "d" ),
-    transaction.MakeUniq( "d", "c", "b", "d", "b" ),
+    simple.MakeUniq( "a", "b", "a", "b", "c", "c" ),
+    simple.MakeUniq( "c", "b", "b", "c", "a" ),
+    simple.MakeUniq( "c", "d", "d", "c", "c", "d" ),
+    simple.MakeUniq( "d", "c", "b", "d", "b" ),
   }
 
   input   := io.NewMemoryInput(&trans)

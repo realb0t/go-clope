@@ -15,28 +15,30 @@ package clope_example
 
 import (
   "github.com/realb0t/go-clope/clope"
-  "github.com/realb0t/go-clope/transaction"
-  "github.com/realb0t/go-clope/cluster"
   "github.com/realb0t/go-clope/cluster/store"
+  "github.com/realb0t/go-clope/transaction"
+  "github.com/realb0t/go-clope/transaction/simple"
   io "github.com/realb0t/go-clope/io/memory"
+  driver "github.com/realb0t/go-clope/cluster/store/driver/memory"
 )
 
 func main() {
   trans := []*transaction.Transaction{ 
-    tr.Make( "a", "b" ),
-    tr.Make( "a", "b", "c" ),
-    tr.Make( "a", "c", "d" ),
-    tr.Make( "d", "e" ),
-    tr.Make( "d", "e", "f" ),
-    tr.Make( "h", "e", "l", "l", "o", " ", "w", "o", "r", "l", "d" ),
-    tr.Make( "h", "e", "l", "l", "o" ),
-    tr.Make( "w", "o", "r", "l", "d" ),
+    simple.Make( "a", "b" ),
+    simple.Make( "a", "b", "c" ),
+    simple.Make( "a", "c", "d" ),
+    simple.Make( "d", "e" ),
+    simple.Make( "d", "e", "f" ),
+    simple.Make( "h", "e", "l", "l", "o", " ", "w", "o", "r", "l", "d" ),
+    simple.Make( "h", "e", "l", "l", "o" ),
+    simple.Make( "w", "o", "r", "l", "d" ),
   }
 
   repulsion := 1.8
   input     := io.NewMemoryInput(&trans)
   output    := io.NewMemoryOutput()
-  storage   := store.MemoryStore()
+  driver    := driver.NewMemory()
+  storage   := store.NewStore(driver)
   process   := clope.NewProcess(input, output, store, repulsion)
   err       := process.Build()
 

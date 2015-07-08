@@ -5,6 +5,7 @@ import (
   "github.com/realb0t/go-clope/cluster"
   "github.com/realb0t/go-clope/cluster/store"
   "github.com/realb0t/go-clope/transaction"
+  "github.com/realb0t/go-clope/transaction/simple"
   driver "github.com/realb0t/go-clope/cluster/store/driver/memory"
 )
 
@@ -18,11 +19,11 @@ func TestDeltaAddEvaluative(t *testing.T) {
   s := store.NewStore(d)
 
   trans := []transaction.Transaction{
-    transaction.Make( "a", "b" ),
-    transaction.Make( "a", "b", "c" ),
-    transaction.Make( "a", "c", "d" ),
-    transaction.Make( "d", "e" ),
-    transaction.Make( "d", "e", "f" ),
+    simple.Make( "a", "b" ),
+    simple.Make( "a", "b", "c" ),
+    simple.Make( "a", "c", "d" ),
+    simple.Make( "d", "e" ),
+    simple.Make( "d", "e", "f" ),
   }
 
   clusters := make([]*cluster.Cluster, 4)
